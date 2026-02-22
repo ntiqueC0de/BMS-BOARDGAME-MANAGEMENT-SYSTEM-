@@ -1155,6 +1155,14 @@ export default function App() {
   const [amountStr, setAmountStr] = useState("0");
   const [newPlayerName, setNewPlayerName] = useState("");
 
+  // Derived states to fix reference errors
+  const activeP = modalConfig
+    ? state.players.find((p) => p.id === modalConfig.activePlayerId)
+    : null;
+  const availableTargets = activeP
+    ? state.players.filter((p) => p.id !== activeP.id && !p.isBankrupt)
+    : [];
+
   const [activePropId, setActivePropId] = useState(null);
   const [propConfirmAction, setPropConfirmAction] = useState(null);
   const [isEditingBoard, setIsEditingBoard] = useState(false);
@@ -1253,11 +1261,10 @@ export default function App() {
 
   // Pre-Transaction UI Barrier (Insufficient Funds Checks)
   const executeTx = () => {
-    if (amountStr === "0") return;
+    if (amountStr === "0" || !activeP) return;
 
     const amountNum = parseInt(amountStr, 10);
-    const { activePlayerId } = modalConfig;
-    const activeP = state.players.find((p) => p.id === activePlayerId);
+    const activePlayerId = activeP.id;
 
     if (txType === "PAY_PLAYER" || txType === "PAY_BANK") {
       if (activeP.balance < amountNum) {
@@ -2939,6 +2946,7 @@ export default function App() {
                   const propDef = state.board.find(
                     (p) => p.id === activePropId,
                   );
+                  if (!propDef) return null;
                   const pState = state.propertyState[activePropId] || {
                     ownerId: null,
                     houses: 0,
