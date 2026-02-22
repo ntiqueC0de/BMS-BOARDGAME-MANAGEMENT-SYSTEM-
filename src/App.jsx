@@ -36,6 +36,7 @@ import {
   Ship,
   Palette,
   PartyPopper,
+  ArrowRightLeft,
 } from "lucide-react";
 
 // ==========================================
@@ -59,7 +60,7 @@ const Confetti = () => {
   }));
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-[200] overflow-hidden">
+    <div className="absolute inset-0 pointer-events-none z-[500] overflow-hidden">
       {pieces.map((p) => (
         <div
           key={p.id}
@@ -425,7 +426,7 @@ const THEMES = {
     base: "bg-neutral-950 text-neutral-100",
     card: "bg-neutral-900 border-neutral-800",
     header: "bg-neutral-950/80 border-neutral-900",
-    nav: "bg-neutral-950/90 border-neutral-900",
+    nav: "bg-neutral-950 border-neutral-900",
     textMain: "text-white",
     textMuted: "text-neutral-400",
     textFaint: "text-neutral-600",
@@ -447,7 +448,7 @@ const THEMES = {
     base: "bg-slate-50 text-slate-900",
     card: "bg-white border-slate-200 shadow-sm",
     header: "bg-white/80 border-slate-200",
-    nav: "bg-white/90 border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]",
+    nav: "bg-white border-slate-200",
     textMain: "text-slate-900",
     textMuted: "text-slate-500",
     textFaint: "text-slate-400",
@@ -469,12 +470,12 @@ const THEMES = {
     base: "bg-[#0b1120] text-slate-100",
     card: "bg-[#111827] border-[#1e293b]",
     header: "bg-[#0b1120]/80 border-[#0b1120]",
-    nav: "bg-[#0b1120]/90 border-[#1e293b]",
+    nav: "bg-[#0b1120] border-[#1e293b]",
     textMain: "text-slate-50",
     textMuted: "text-slate-400",
     textFaint: "text-slate-600",
     border: "border-[#1e293b]",
-    borderHover: "hover:border-[#334155 hover:scale-[1.01]",
+    borderHover: "hover:border-[#334155] hover:scale-[1.01]",
     input: "bg-[#0b1120] border-[#1e293b] text-slate-50",
     numpad: "bg-[#1e293b] text-slate-50 active:bg-[#334155]",
     numpadDel:
@@ -491,7 +492,7 @@ const THEMES = {
     base: "bg-[#1c1917] text-[#f5f5f4]",
     card: "bg-[#292524] border-[#44403c]",
     header: "bg-[#1c1917]/80 border-[#1c1917]",
-    nav: "bg-[#1c1917]/90 border-[#44403c]",
+    nav: "bg-[#1c1917] border-[#44403c]",
     textMain: "text-[#fafaf9]",
     textMuted: "text-[#a8a29e]",
     textFaint: "text-[#78716c]",
@@ -513,7 +514,7 @@ const THEMES = {
     base: "bg-[#082f49] text-sky-50",
     card: "bg-[#0f172a] border-[#0ea5e9]/50",
     header: "bg-[#082f49]/80 border-[#0ea5e9]/50",
-    nav: "bg-[#082f49]/90 border-[#0ea5e9]/50",
+    nav: "bg-[#082f49] border-[#0ea5e9]/50",
     textMain: "text-sky-100",
     textMuted: "text-sky-300",
     textFaint: "text-sky-500/50",
@@ -535,7 +536,7 @@ const THEMES = {
     base: "bg-[#022c22] text-emerald-50",
     card: "bg-[#064e3b] border-[#10b981]/50",
     header: "bg-[#022c22]/80 border-[#10b981]/50",
-    nav: "bg-[#022c22]/90 border-[#10b981]/50",
+    nav: "bg-[#022c22] border-[#10b981]/50",
     textMain: "text-emerald-50",
     textMuted: "text-emerald-300",
     textFaint: "text-emerald-500/50",
@@ -557,7 +558,7 @@ const THEMES = {
     base: "bg-[#09090b] text-[#fdf4ff]",
     card: "bg-[#18181b] border-[#ec4899]/50",
     header: "bg-[#09090b]/80 border-[#ec4899]/50",
-    nav: "bg-[#09090b]/90 border-[#ec4899]/50",
+    nav: "bg-[#09090b] border-[#ec4899]/50",
     textMain: "text-[#fdf4ff]",
     textMuted: "text-[#f472b6]",
     textFaint: "text-[#be185d]",
@@ -592,7 +593,7 @@ const INITIAL_STATE = {
     theme: "dark",
   },
   setupError: null,
-  pendingMonopolyAlert: null, // Triggers Monopoly completion popup
+  pendingMonopolyAlert: null,
 };
 
 // ==========================================
@@ -605,13 +606,11 @@ const checkMonopoly = (board, propState, propertyId, newOwnerId) => {
 
   const groupProps = board.filter((p) => p.group === propDef.group);
 
-  // Is it a monopoly NOW?
   const isNowMonopoly = groupProps.every((p) => {
-    if (p.id === propertyId) return true; // Pretend newly acquired property is owned
+    if (p.id === propertyId) return true;
     return propState[p.id]?.ownerId === newOwnerId;
   });
 
-  // Was it ALREADY a monopoly? (prevents spamming alerts during building/mortgaging)
   const wasMonopoly = groupProps.every(
     (p) => propState[p.id]?.ownerId === newOwnerId,
   );
@@ -620,6 +619,13 @@ const checkMonopoly = (board, propState, propertyId, newOwnerId) => {
     return { group: propDef.group, color: propDef.color };
   }
   return null;
+};
+
+const doesGroupHaveHouses = (board, propState, propertyId) => {
+  const propDef = board.find((p) => p.id === propertyId);
+  if (!propDef) return false;
+  const groupProps = board.filter((p) => p.group === propDef.group);
+  return groupProps.some((p) => propState[p.id]?.houses > 0);
 };
 
 // ==========================================
@@ -838,7 +844,6 @@ function gameReducer(state, action) {
       newPlayers[buyerIdx].balance -= cost;
       newPlayers[ownerIdx].balance += refund;
 
-      // Monopoly Check before transfer
       const newMonopoly = checkMonopoly(
         state.board,
         state.propertyState,
@@ -879,6 +884,73 @@ function gameReducer(state, action) {
             amount: cost,
             type: "PROPERTY",
             message: `${buyerName} seized ${propDef.name}`,
+          },
+          ...state.history,
+        ],
+      };
+    }
+
+    case "EXECUTE_TRADE": {
+      const { p1Id, p2Id, p1Offer, p2Offer } = action.payload;
+      let newPlayers = [...state.players];
+      let newPropState = { ...state.propertyState };
+
+      const p1Idx = newPlayers.findIndex((p) => p.id === p1Id);
+      const p2Idx = newPlayers.findIndex((p) => p.id === p2Id);
+
+      const p1Name = newPlayers[p1Idx].name;
+      const p2Name = newPlayers[p2Idx].name;
+
+      newPlayers[p1Idx].balance =
+        newPlayers[p1Idx].balance - p1Offer.cash + p2Offer.cash;
+      newPlayers[p2Idx].balance =
+        newPlayers[p2Idx].balance - p2Offer.cash + p1Offer.cash;
+
+      let p1GotMonopoly = null;
+      let p2GotMonopoly = null;
+
+      p1Offer.props.forEach((pid) => {
+        const m = checkMonopoly(state.board, newPropState, pid, p2Id);
+        if (m)
+          p2GotMonopoly = {
+            playerName: p2Name,
+            groupName: m.group,
+            color: m.color,
+          };
+        newPropState[pid] = { ...newPropState[pid], ownerId: p2Id };
+      });
+
+      p2Offer.props.forEach((pid) => {
+        const m = checkMonopoly(state.board, newPropState, pid, p1Id);
+        if (m)
+          p1GotMonopoly = {
+            playerName: p1Name,
+            groupName: m.group,
+            color: m.color,
+          };
+        newPropState[pid] = { ...newPropState[pid], ownerId: p1Id };
+      });
+
+      let triggeredBankruptcy = null;
+      if (newPlayers[p1Idx].balance === 0) triggeredBankruptcy = p1Id;
+      else if (newPlayers[p2Idx].balance === 0) triggeredBankruptcy = p2Id;
+
+      return {
+        ...state,
+        players: newPlayers,
+        propertyState: newPropState,
+        error: null,
+        pendingBankruptcy: triggeredBankruptcy,
+        pendingMonopolyAlert: p1GotMonopoly || p2GotMonopoly || null,
+        history: [
+          {
+            id: generateId(),
+            timestamp: Date.now(),
+            from: p1Id,
+            to: p2Id,
+            amount: 0,
+            type: "PROPERTY",
+            message: `Trade executed between ${p1Name} & ${p2Name}`,
           },
           ...state.history,
         ],
@@ -960,25 +1032,22 @@ function gameReducer(state, action) {
         triggeredBankruptcy = playerId;
       }
 
-      // Attach Alert if applicable
-      const alertPayload = newlyFormedMonopoly
-        ? {
-            playerName:
-              actionType === "TRANSFER"
-                ? newPlayers.find((p) => p.id === targetPlayerId).name
-                : pName,
-            groupName: newlyFormedMonopoly.group,
-            color: newlyFormedMonopoly.color,
-          }
-        : null;
-
       return {
         ...state,
         players: newPlayers,
         propertyState: newPropState,
         error: null,
         pendingBankruptcy: triggeredBankruptcy,
-        pendingMonopolyAlert: alertPayload,
+        pendingMonopolyAlert: newlyFormedMonopoly
+          ? {
+              playerName:
+                actionType === "TRANSFER"
+                  ? state.players.find((p) => p.id === targetPlayerId).name
+                  : pName,
+              groupName: newlyFormedMonopoly.group,
+              color: newlyFormedMonopoly.color,
+            }
+          : null,
         history: [
           {
             id: generateId(),
@@ -1074,7 +1143,7 @@ const renderDynamicIcon = (iconName, size, className) => {
 // ==========================================
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
-  const [activeTab, setActiveTab] = useState("board");
+  const [activeTab, setActiveTab] = useState("home");
 
   const t = THEMES[state.settings.theme] || THEMES.dark;
   const isDark = t.isDark;
@@ -1089,12 +1158,16 @@ export default function App() {
   const [activePropId, setActivePropId] = useState(null);
   const [propConfirmAction, setPropConfirmAction] = useState(null);
   const [isEditingBoard, setIsEditingBoard] = useState(false);
+  const [boardResetConfirm, setBoardResetConfirm] = useState(false);
+
+  // Trade Wizard State
+  const [tradeWizard, setTradeWizard] = useState(null);
 
   const [endGameConfirm, setEndGameConfirm] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
 
   const [bankModal, setBankModal] = useState(false);
-  const [monopolyAlert, setMonopolyAlert] = useState(null); // Local state to handle the animation rendering
+  const [monopolyAlert, setMonopolyAlert] = useState(null);
 
   const prevHistoryLength = useRef(state.history.length);
   const [toast, setToast] = useState(null);
@@ -1119,6 +1192,13 @@ export default function App() {
     localStorage.setItem("babe_state", JSON.stringify(state));
   }, [state]);
 
+  // Ensure app always drops onto the home screen when entering game phase
+  useEffect(() => {
+    if (state.phase === "playing") {
+      setActiveTab("home");
+    }
+  }, [state.phase]);
+
   // UI Side Effect: Listen for History Growth (Transaction Success)
   useEffect(() => {
     if (state.history.length > prevHistoryLength.current) {
@@ -1128,6 +1208,7 @@ export default function App() {
       setModalConfig(null);
       setActivePropId(null);
       setPropConfirmAction(null);
+      setTradeWizard(null);
       setBankModal(false);
       setTxType("PAY_PLAYER");
       setTargetId("");
@@ -1141,7 +1222,7 @@ export default function App() {
     if (state.pendingMonopolyAlert) {
       setMonopolyAlert(state.pendingMonopolyAlert);
       dispatch({ type: "CLEAR_MONOPOLY_ALERT" });
-      setTimeout(() => setMonopolyAlert(null), 5000); // Hide after 5 seconds
+      setTimeout(() => setMonopolyAlert(null), 5000);
     }
   }, [state.pendingMonopolyAlert]);
 
@@ -1154,6 +1235,7 @@ export default function App() {
     setModalConfig(null);
     setActivePropId(null);
     setPropConfirmAction(null);
+    setTradeWizard(null);
     setBankModal(false);
     setTxType("PAY_PLAYER");
     setTargetId("");
@@ -1177,7 +1259,6 @@ export default function App() {
     const { activePlayerId } = modalConfig;
     const activeP = state.players.find((p) => p.id === activePlayerId);
 
-    // UX Barrier: Check if player actually has the money before dispatching
     if (txType === "PAY_PLAYER" || txType === "PAY_BANK") {
       if (activeP.balance < amountNum) {
         showToast("Insufficient funds! Take a loan first.", "error");
@@ -1287,13 +1368,324 @@ export default function App() {
   };
 
   // ==========================================
+  // VIEW: TRADE WIZARD
+  // ==========================================
+  const renderTradeWizard = () => {
+    if (!tradeWizard) return null;
+    const p1 = state.players.find((p) => p.id === tradeWizard.p1Id);
+
+    // Step 1: Select Partner
+    if (tradeWizard.step === 1) {
+      return (
+        <div
+          className={`absolute inset-0 z-[300] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
+        >
+          <div
+            className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
+          >
+            <div
+              className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b ${t.modalHeader}`}
+            >
+              <div>
+                <h3 className={`font-bold leading-tight ${t.textMain}`}>
+                  Trade Wizard
+                </h3>
+                <span
+                  className={`text-xs uppercase font-bold tracking-widest ${t.textMuted}`}
+                >
+                  Select Partner
+                </span>
+              </div>
+              <button
+                onClick={closeModals}
+                className={`p-3 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-3">
+                {state.players
+                  .filter((p) => p.id !== p1.id && !p.isBankrupt)
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() =>
+                        setTradeWizard((prev) => ({
+                          ...prev,
+                          step: 2,
+                          p2Id: p.id,
+                        }))
+                      }
+                      className={`py-4 rounded-xl border flex flex-col items-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-95 ${t.card} ${t.borderHover}`}
+                    >
+                      <div
+                        className={`w-4 h-4 rounded-full ${p.color.bg}`}
+                      ></div>
+                      <span className={`font-bold ${t.textMain}`}>
+                        {p.name}
+                      </span>
+                    </button>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Step 2: Build Trade
+    const p2 = state.players.find((p) => p.id === tradeWizard.p2Id);
+
+    const toggleTradeProp = (propId, isP1) => {
+      if (doesGroupHaveHouses(state.board, state.propertyState, propId)) {
+        showToast(
+          "Cannot trade properties while houses exist in its color group. Sell houses first.",
+          "error",
+        );
+        return;
+      }
+      setTradeWizard((prev) => {
+        const list = isP1 ? prev.p1Offer.props : prev.p2Offer.props;
+        const newList = list.includes(propId)
+          ? list.filter((id) => id !== propId)
+          : [...list, propId];
+        return {
+          ...prev,
+          [isP1 ? "p1Offer" : "p2Offer"]: {
+            ...prev[isP1 ? "p1Offer" : "p2Offer"],
+            props: newList,
+          },
+        };
+      });
+    };
+
+    const handleExecuteTrade = () => {
+      dispatch({ type: "CLEAR_ERROR" });
+      const p1CashNum = parseInt(tradeWizard.p1Offer.cash, 10) || 0;
+      const p2CashNum = parseInt(tradeWizard.p2Offer.cash, 10) || 0;
+
+      if (p1.balance < p1CashNum) {
+        showToast(`${p1.name} has insufficient funds for this trade!`, "error");
+        return;
+      }
+      if (p2.balance < p2CashNum) {
+        showToast(`${p2.name} has insufficient funds for this trade!`, "error");
+        return;
+      }
+
+      dispatch({
+        type: "EXECUTE_TRADE",
+        payload: {
+          p1Id: p1.id,
+          p2Id: p2.id,
+          p1Offer: { cash: p1CashNum, props: tradeWizard.p1Offer.props },
+          p2Offer: { cash: p2CashNum, props: tradeWizard.p2Offer.props },
+        },
+      });
+    };
+
+    const renderTradeSection = (player, offer, isP1) => {
+      const ownedProps = state.board.filter(
+        (b) => state.propertyState[b.id]?.ownerId === player.id,
+      );
+
+      return (
+        <div
+          className={`p-4 rounded-2xl border flex flex-col h-full ${t.card}`}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h4 className={`font-bold flex items-center gap-2 ${t.textMain}`}>
+              <div
+                className={`w-3 h-3 rounded-full ${player.color.bg} shadow-sm`}
+              ></div>{" "}
+              {player.name} Gives
+            </h4>
+            <span className={`text-xs font-bold ${t.textMuted}`}>
+              Bal: ${player.balance}
+            </span>
+          </div>
+
+          <div className="mb-4 space-y-2">
+            <div className="flex justify-between items-end">
+              <span
+                className={`text-[10px] font-bold uppercase tracking-widest ${t.textMuted}`}
+              >
+                Cash Offer
+              </span>
+              <span
+                className={`text-xl font-black ${isP1 ? "text-sky-500" : "text-emerald-500"}`}
+              >
+                ${offer.cash || 0}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max={player.balance}
+              step="10"
+              value={offer.cash || 0}
+              onChange={(e) =>
+                setTradeWizard((prev) => ({
+                  ...prev,
+                  [isP1 ? "p1Offer" : "p2Offer"]: {
+                    ...prev[isP1 ? "p1Offer" : "p2Offer"],
+                    cash: parseInt(e.target.value, 10),
+                  },
+                }))
+              }
+              className={`w-full h-2 rounded-lg appearance-none cursor-pointer bg-black/10 dark:bg-white/10 ${isP1 ? "accent-sky-500" : "accent-emerald-500"}`}
+            />
+          </div>
+
+          <div className="space-y-2 flex-1 overflow-y-auto pr-1 hide-scrollbar min-h-[100px] max-h-[150px]">
+            {ownedProps.length === 0 && (
+              <p className={`text-xs italic mt-2 text-center ${t.textFaint}`}>
+                No properties owned.
+              </p>
+            )}
+            {ownedProps.map((p) => {
+              const isSelected = offer.props.includes(p.id);
+              const groupHasHouses = doesGroupHaveHouses(
+                state.board,
+                state.propertyState,
+                p.id,
+              );
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => toggleTradeProp(p.id, isP1)}
+                  className={`border rounded-xl p-2.5 flex justify-between items-center cursor-pointer transition-all duration-200 ${isSelected ? `border-${isP1 ? "sky" : "emerald"}-500 shadow-sm ${t.p2pTag}` : `${t.input} ${groupHasHouses ? "opacity-30" : ""}`}`}
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <div
+                      className={`w-3 h-3 rounded-sm shrink-0 border border-black/10`}
+                      style={
+                        p.color.startsWith("bg-[")
+                          ? { backgroundColor: p.color.slice(4, -1) }
+                          : undefined
+                      }
+                    >
+                      {!p.color.startsWith("bg-[") && (
+                        <div className={`w-full h-full ${p.color}`} />
+                      )}
+                    </div>
+                    <span
+                      className={`text-xs font-bold truncate ${t.textMain}`}
+                    >
+                      {p.name}
+                    </span>
+                  </div>
+                  <div
+                    className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border transition-colors ${isSelected ? (isP1 ? "bg-sky-500 border-sky-500" : "bg-emerald-500 border-emerald-500") : t.border}`}
+                  >
+                    {isSelected && <Check size={10} className="text-white" />}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div
+        className={`absolute inset-0 z-[300] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
+      >
+        <div
+          className={`w-full sm:w-[800px] sm:max-h-[85vh] h-[95%] sm:h-auto rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
+        >
+          <header
+            className={`px-6 py-4 border-b flex justify-between items-center shrink-0 rounded-t-3xl sm:rounded-t-3xl ${t.modalHeader}`}
+          >
+            <h2
+              className={`font-black text-lg flex items-center gap-2 ${t.textMain}`}
+            >
+              <ArrowRightLeft size={18} /> Trade Ledger
+            </h2>
+            <button
+              onClick={closeModals}
+              className={`p-2 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+            >
+              <X size={20} />
+            </button>
+          </header>
+
+          <div className="flex-1 overflow-y-auto p-4 hide-scrollbar">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
+              {renderTradeSection(p1, tradeWizard.p1Offer, true)}
+              {/* Visual Divider for Mobile only */}
+              <div className="flex justify-center -my-3 sm:hidden relative z-10 pointer-events-none">
+                <div
+                  className={`p-2 rounded-full border shadow-md ${t.card} ${t.textMuted}`}
+                >
+                  <ArrowRightLeft size={16} className="rotate-90" />
+                </div>
+              </div>
+              {renderTradeSection(p2, tradeWizard.p2Offer, false)}
+            </div>
+          </div>
+
+          <div className={`p-4 border-t shrink-0 ${t.card}`}>
+            <button
+              onClick={handleExecuteTrade}
+              className="w-full py-4 bg-emerald-500 text-white font-black text-lg rounded-2xl shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <Check size={24} /> Execute Trade
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ==========================================
   // VIEW: BOARD EDITOR (Rendered Outside Main Tree)
   // ==========================================
   const renderBoardEditor = () => {
     return (
       <div
-        className={`fixed inset-0 z-[300] flex flex-col animate-in slide-in-from-bottom-full duration-300 ease-out ${t.base}`}
+        className={`absolute inset-0 z-[300] flex flex-col animate-in slide-in-from-bottom-full duration-300 ease-out ${t.base}`}
       >
+        {/* Custom Reset Modal overlaying the editor */}
+        {boardResetConfirm && (
+          <div
+            className={`absolute inset-0 z-[400] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+          >
+            <div
+              className={`border border-rose-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
+            >
+              <div className="text-center mb-6">
+                <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                  Reset Board?
+                </h2>
+                <p className={`text-sm ${t.textMuted}`}>
+                  This will wipe all custom names, colors, and prices. This
+                  cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setBoardResetConfirm(false)}
+                  className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    dispatch({ type: "RESET_BOARD_DEFAULTS" });
+                    setBoardResetConfirm(false);
+                  }}
+                  className="flex-1 py-3 bg-rose-600 text-white font-black rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <header
           className={`px-6 py-4 border-b flex justify-between items-center shrink-0 ${t.card}`}
         >
@@ -1314,12 +1706,7 @@ export default function App() {
             Changes save automatically and persist across new games.
           </p>
           <button
-            onClick={() => {
-              if (
-                confirm("Reset all properties to standard Monopoly defaults?")
-              )
-                dispatch({ type: "RESET_BOARD_DEFAULTS" });
-            }}
+            onClick={() => setBoardResetConfirm(true)}
             className={`w-full py-3 border border-rose-500/50 text-rose-500 rounded-xl font-bold mb-4 hover:bg-rose-500/10 transition-colors`}
           >
             Reset to Defaults
@@ -1327,7 +1714,7 @@ export default function App() {
 
           {state.board.map((prop, idx) => (
             <div
-              key={prop.id}
+              key={prop.id + prop.name}
               className={`border rounded-2xl p-4 flex flex-col gap-3 ${t.card}`}
             >
               <div className="flex items-center gap-3">
@@ -1443,112 +1830,23 @@ export default function App() {
     );
   };
 
-  // ==========================================
-  // VIEW: GAME OVER (PODIUM)
-  // ==========================================
-  if (state.phase === "game_over") {
-    const rankedPlayers = state.players
-      .map((p) => {
-        let netWorth = p.balance - (p.debt || 0);
-        let propValue = 0,
-          buildValue = 0;
-        Object.keys(state.propertyState).forEach((propId) => {
-          const pState = state.propertyState[propId];
-          if (pState.ownerId === p.id) {
-            const propDef = state.board.find((b) => b.id === propId);
-            if (pState.mortgaged) propValue += propDef.price / 2;
-            else propValue += propDef.price;
-            buildValue += pState.houses * (propDef.build || 0);
-          }
-        });
-        return {
-          ...p,
-          netWorth: netWorth + propValue + buildValue,
-          propValue,
-          buildValue,
-        };
-      })
-      .sort((a, b) => b.netWorth - a.netWorth);
-
-    return (
-      <div
-        className={`min-h-screen w-full flex flex-col p-6 animate-in fade-in zoom-in-95 duration-500 ease-out relative overflow-hidden ${t.base}`}
-      >
-        <Confetti />
-        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <div className="text-center mt-12 mb-8 relative z-10">
-          <Award size={64} className="text-emerald-500 mx-auto mb-4" />
-          <h1
-            className={`text-5xl font-black tracking-tighter mb-2 ${t.textMain}`}
-          >
-            Game Over
-          </h1>
-          <p className={`font-medium ${t.textMuted}`}>
-            Final Net Worth Rankings
-          </p>
-        </div>
-
-        <div className="space-y-4 max-w-md mx-auto w-full relative z-10 flex-1">
-          {rankedPlayers.map((p, idx) => (
-            <div
-              key={p.id}
-              className={`border rounded-3xl p-5 flex items-center gap-4 transition-all duration-300 animate-in slide-in-from-bottom-8 ${t.card} ${idx === 0 ? "border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.15)] scale-105" : ""}`}
-              style={{ animationDelay: `${idx * 100}ms` }}
-            >
-              <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-xl shrink-0 ${idx === 0 ? "bg-amber-500 text-amber-950" : idx === 1 ? "bg-slate-300 text-slate-800" : idx === 2 ? "bg-[#cd7f32] text-white" : `${isDark ? "bg-neutral-800" : "bg-slate-200"} ${t.textMuted}`}`}
-              >
-                #{idx + 1}
-              </div>
-              <div className="flex-1">
-                <h3
-                  className={`text-lg font-bold flex items-center gap-2 ${t.textMain}`}
-                >
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${p.color.bg}`}
-                  ></div>{" "}
-                  {p.name}
-                </h3>
-                <div
-                  className={`flex gap-3 text-[10px] font-bold uppercase tracking-widest mt-1 flex-wrap ${t.textMuted}`}
-                >
-                  <span>Cash: ${p.balance}</span>
-                  {p.debt > 0 && (
-                    <span className="text-rose-500">Debt: -${p.debt}</span>
-                  )}
-                  <span>Assets: ${p.propValue + p.buildValue}</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-black text-emerald-500">
-                  ${p.netWorth.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 max-w-md mx-auto w-full relative z-10 pb-8">
-          <button
-            onClick={() => dispatch({ type: "RESET_GAME" })}
-            className={`w-full py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-95 transition-all duration-200 ${isDark ? "bg-white text-black hover:bg-neutral-200" : "bg-slate-900 text-white hover:bg-slate-800 shadow-md"}`}
-          >
-            Start New Game
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ==========================================
-  // RENDER: SETUP
-  // ==========================================
   const renderSetup = () => (
-    <div
-      className={`min-h-screen w-full flex flex-col items-center justify-center p-6 font-sans selection:bg-emerald-500/30 transition-colors duration-300 ${t.base}`}
-    >
-      <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500 ease-out">
+    <div className="flex-1 flex flex-col p-6 overflow-y-auto hide-scrollbar relative">
+      <div className="absolute top-6 right-6 z-10">
+        <button
+          onClick={() =>
+            dispatch({
+              type: "UPDATE_SETTINGS",
+              payload: { theme: isDark ? "light" : "dark" },
+            })
+          }
+          className={`p-3 rounded-full border ${t.card} ${t.textMuted} hover:${t.textMain} hover:scale-[1.05] active:scale-95 transition-all duration-200`}
+        >
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+      </div>
+
+      <div className="w-full max-w-md mx-auto space-y-8 animate-in fade-in duration-500 ease-out mt-8 pb-10">
         <div className="text-center space-y-2">
           <div className="bg-emerald-500/10 text-emerald-500 w-20 h-20 rounded-2xl mx-auto flex items-center justify-center mb-4 ring-1 ring-emerald-500/30 transition-transform hover:scale-105 duration-300">
             <Landmark size={40} />
@@ -1608,7 +1906,7 @@ export default function App() {
               )}
             </div>
 
-            <div className="space-y-2 mb-6 min-h-[100px]">
+            <div className="space-y-2 mb-6 min-h-[100px] max-h-[30vh] overflow-y-auto pr-1 hide-scrollbar">
               {state.players.length === 0 ? (
                 <div
                   className={`h-full flex items-center justify-center text-sm italic py-4 ${t.textFaint}`}
@@ -1682,7 +1980,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 pb-8">
           <button
             onClick={() => dispatch({ type: "START_GAME" })}
             disabled={state.players.length < 2}
@@ -1718,1303 +2016,314 @@ export default function App() {
     </div>
   );
 
-  // --- Main App Logic for Active Game ---
-  const activeP = modalConfig
-    ? state.players.find((p) => p.id === modalConfig.activePlayerId) || null
-    : null;
-  const availableTargets =
-    activeP && Array.isArray(state.players)
-      ? state.players.filter((p) => p.id !== activeP.id && !p.isBankrupt)
-      : [];
+  const renderGameOver = () => {
+    const rankedPlayers = state.players
+      .map((p) => {
+        let netWorth = p.balance - (p.debt || 0);
+        let propValue = 0,
+          buildValue = 0;
+        Object.keys(state.propertyState).forEach((propId) => {
+          const pState = state.propertyState[propId];
+          if (pState.ownerId === p.id) {
+            const propDef = state.board.find((b) => b.id === propId);
+            if (pState.mortgaged) propValue += propDef.price / 2;
+            else propValue += propDef.price;
+            buildValue += pState.houses * (propDef.build || 0);
+          }
+        });
+        return {
+          ...p,
+          netWorth: netWorth + propValue + buildValue,
+          propValue,
+          buildValue,
+        };
+      })
+      .sort((a, b) => b.netWorth - a.netWorth);
+
+    return (
+      <div className="flex-1 flex flex-col p-6 animate-in fade-in zoom-in-95 duration-500 ease-out relative overflow-hidden">
+        <Confetti />
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="text-center mt-6 sm:mt-12 mb-8 relative z-10 shrink-0">
+          <Award size={64} className="text-emerald-500 mx-auto mb-4" />
+          <h1
+            className={`text-4xl sm:text-5xl font-black tracking-tighter mb-2 ${t.textMain}`}
+          >
+            Game Over
+          </h1>
+          <p className={`font-medium ${t.textMuted}`}>
+            Final Net Worth Rankings
+          </p>
+        </div>
+
+        <div className="space-y-4 max-w-md mx-auto w-full relative z-10 flex-1 overflow-y-auto pb-6 hide-scrollbar">
+          {rankedPlayers.map((p, idx) => (
+            <div
+              key={p.id}
+              className={`border rounded-3xl p-5 flex items-center gap-4 transition-all duration-300 animate-in slide-in-from-bottom-8 ${t.card} ${idx === 0 ? "border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.15)] scale-105" : ""}`}
+              style={{ animationDelay: `${idx * 100}ms` }}
+            >
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-xl shrink-0 ${idx === 0 ? "bg-amber-500 text-amber-950" : idx === 1 ? "bg-slate-300 text-slate-800" : idx === 2 ? "bg-[#cd7f32] text-white" : `${isDark ? "bg-neutral-800" : "bg-slate-200"} ${t.textMuted}`}`}
+              >
+                #{idx + 1}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3
+                  className={`text-lg font-bold flex items-center gap-2 truncate ${t.textMain}`}
+                >
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${p.color.bg}`}
+                  ></div>{" "}
+                  <span className="truncate">{p.name}</span>
+                </h3>
+                <div
+                  className={`flex gap-3 text-[10px] font-bold uppercase tracking-widest mt-1 flex-wrap ${t.textMuted}`}
+                >
+                  <span>Cash: ${p.balance}</span>
+                  {p.debt > 0 && (
+                    <span className="text-rose-500">Debt: -${p.debt}</span>
+                  )}
+                  <span>Assets: ${p.propValue + p.buildValue}</span>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-xl sm:text-2xl font-black text-emerald-500">
+                  ${p.netWorth.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="shrink-0 max-w-md mx-auto w-full relative z-10 pb-4 pt-4">
+          <button
+            onClick={() => dispatch({ type: "RESET_GAME" })}
+            className={`w-full py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-95 transition-all duration-200 ${isDark ? "bg-white text-black hover:bg-neutral-200" : "bg-slate-900 text-white hover:bg-slate-800 shadow-md"}`}
+          >
+            Start New Game
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
-      {isEditingBoard && renderBoardEditor()}
-
-      {/* GLOBAL MONOPOLY POPUP OVERLAY */}
-      {monopolyAlert && (
-        <div
-          className={`fixed inset-0 z-[400] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 fade-in duration-500 ${t.modalOverlay} backdrop-blur-md`}
-        >
-          <PartyPopper
-            size={80}
-            className="text-emerald-500 mb-6 animate-bounce"
-          />
-          <div
-            className={`border-4 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_80px_rgba(16,185,129,0.3)] ${t.modalBg}`}
-            style={{
-              borderColor: monopolyAlert.color.startsWith("bg-[")
-                ? monopolyAlert.color.slice(4, -1)
-                : undefined,
-            }}
-          >
-            <h2
-              className={`text-4xl font-black mb-2 uppercase tracking-tighter ${t.textMain}`}
-            >
-              Monopoly!
-            </h2>
-            <p className={`text-lg font-bold ${t.textMuted}`}>
-              <span className={t.textMain}>{monopolyAlert.playerName}</span> has
-              completed the{" "}
-              <span className={t.textMain}>{monopolyAlert.groupName}</span>{" "}
-              group!
-            </p>
-            <p className={`text-xs mt-4 ${t.textFaint}`}>
-              Houses and Hotels can now be built.
-            </p>
-          </div>
-        </div>
-      )}
-
+      {/* STRICT HEIGHT LOCK FOR VIEWPORT - DESKTOP BACKDROP */}
       <div
-        className={`min-h-screen w-full flex justify-center transition-colors duration-300 ${t.base}`}
+        className={`fixed inset-0 w-full flex justify-center transition-colors duration-300 overflow-hidden sm:p-6 sm:py-12 ${isDark ? "bg-black/90" : "bg-slate-300"}`}
       >
-        {state.phase === "setup" ? (
-          renderSetup()
-        ) : (
-          <div
-            className={`w-full font-sans flex flex-col max-w-2xl sm:border-x shadow-2xl relative overflow-hidden ${t.base} ${t.border}`}
-          >
-            <header
-              className={`px-6 py-5 backdrop-blur-md border-b sticky top-0 z-20 flex justify-between items-center transition-colors duration-300 ${t.header}`}
-            >
-              <div className="flex items-center gap-2">
-                <div className="bg-emerald-500 p-1.5 rounded-lg">
-                  <Landmark size={18} className="text-white" />
-                </div>
-                <span
-                  className={`font-bold text-lg tracking-tight ${t.textMain}`}
-                >
-                  B.A.B.E.
-                </span>
-              </div>
-            </header>
-
-            <main className="flex-1 overflow-y-auto pb-24 hide-scrollbar">
-              {activeTab === "board" && (
-                <div className="p-4 space-y-4 animate-in fade-in duration-300">
-                  <button
-                    onClick={() => setBankModal(true)}
-                    className={`w-full border rounded-3xl p-6 relative overflow-hidden text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] ${t.bankGradient} hover:border-emerald-500/50`}
+        {/* APP CONTAINER */}
+        <div
+          className={`w-full h-full font-sans flex flex-col max-w-md sm:rounded-[32px] sm:border shadow-2xl relative overflow-hidden transition-colors duration-300 ${t.base} ${t.border}`}
+        >
+          {state.phase === "setup" ? (
+            renderSetup()
+          ) : state.phase === "game_over" ? (
+            renderGameOver()
+          ) : (
+            // MAIN GAME SCREEN
+            <div className="flex flex-col h-full relative">
+              <header
+                className={`px-6 py-5 backdrop-blur-md border-b shrink-0 flex justify-between items-center transition-colors duration-300 ${t.header}`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="bg-emerald-500 p-1.5 rounded-lg">
+                    <Landmark size={18} className="text-white" />
+                  </div>
+                  <span
+                    className={`font-bold text-lg tracking-tight ${t.textMain}`}
                   >
-                    <div
-                      className={`absolute -right-4 -top-4 pointer-events-none transition-opacity ${isDark ? "opacity-5" : "opacity-[0.03] text-black"}`}
+                    B.A.B.E.
+                  </span>
+                </div>
+              </header>
+
+              <main className="flex-1 overflow-y-auto pb-[90px] hide-scrollbar relative">
+                {activeTab === "home" && (
+                  <div className="p-4 space-y-4 animate-in fade-in duration-300">
+                    <button
+                      onClick={() => setBankModal(true)}
+                      className={`w-full border rounded-3xl p-6 relative overflow-hidden text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] ${t.bankGradient} hover:border-emerald-500/50`}
                     >
-                      <Landmark size={140} />
-                    </div>
-                    <div className="relative z-10 flex justify-between items-end">
-                      <div>
-                        <p
-                          className={`font-bold uppercase tracking-widest text-xs mb-1 ${t.textMuted}`}
-                        >
-                          Central Bank
-                        </p>
-                        <p
-                          className={`text-4xl font-black font-mono tracking-tighter ${t.textMain}`}
-                        >
-                          ∞
-                        </p>
+                      <div
+                        className={`absolute -right-4 -top-4 pointer-events-none transition-opacity ${isDark ? "opacity-5" : "opacity-[0.03] text-black"}`}
+                      >
+                        <Landmark size={140} />
                       </div>
-                      <span className="text-emerald-500 text-xs font-bold uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                        Transfer
-                      </span>
-                    </div>
-                  </button>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {state.players.map((p) => {
-                      const propsCount = Object.values(
-                        state.propertyState,
-                      ).filter((prop) => prop.ownerId === p.id).length;
-                      return (
-                        <button
-                          key={p.id}
-                          onClick={() => {
-                            if (!p.isBankrupt) {
-                              setModalConfig({ activePlayerId: p.id });
-                              setTargetId(
-                                state.players.find(
-                                  (other) =>
-                                    other.id !== p.id && !other.isBankrupt,
-                                )?.id || "",
-                              );
-                            }
-                          }}
-                          className={`text-left relative overflow-hidden rounded-3xl p-5 border transition-all duration-200 active:scale-[0.97]
-                          ${p.isBankrupt ? `opacity-60 grayscale bg-neutral-500/10 ${t.border}` : `${t.card} ${t.borderHover}`}`}
-                        >
-                          <div
-                            className={`absolute top-0 left-0 w-full h-1 ${p.color.bg}`}
-                          ></div>
-                          <div className="flex justify-between items-start mb-4">
-                            <span
-                              className={`font-bold truncate pr-2 ${t.textMain}`}
-                            >
-                              {p.name}
-                            </span>
-                            <div
-                              className={`w-2.5 h-2.5 rounded-full mt-1.5 ${p.color.bg} shadow-sm`}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-end justify-between mb-3">
-                            <div>
-                              <span
-                                className={`text-[10px] font-bold uppercase tracking-widest block mb-0.5 ${t.textMuted}`}
-                              >
-                                Balance
-                              </span>
-                              <span
-                                className={`text-2xl font-black tracking-tight ${p.isBankrupt ? "line-through opacity-50" : p.balance < 0 ? "text-rose-500" : t.textMain}`}
-                              >
-                                ${p.balance.toLocaleString()}
-                              </span>
-                            </div>
-                            {p.debt > 0 && (
-                              <div className="text-right">
-                                <span className="text-rose-500/70 text-[10px] font-bold uppercase tracking-widest block mb-0.5">
-                                  Debt
-                                </span>
-                                <span className="text-sm font-black text-rose-500">
-                                  -${p.debt.toLocaleString()}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div
-                            className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg w-max border ${t.textMuted} ${t.modalHeader}`}
+                      <div className="relative z-10 flex justify-between items-end">
+                        <div>
+                          <p
+                            className={`font-bold uppercase tracking-widest text-xs mb-1 ${t.textMuted}`}
                           >
-                            <Home size={10} /> {propsCount} Assets
-                          </div>
-                          {p.isBankrupt && (
-                            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] flex items-center justify-center">
-                              <span className="bg-rose-500 text-white font-black px-3 py-1 rounded shadow-lg text-xs uppercase tracking-widest rotate-[-10deg]">
-                                Bankrupt
-                              </span>
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                            Central Bank
+                          </p>
+                          <p
+                            className={`text-4xl font-black font-mono tracking-tighter ${t.textMain}`}
+                          >
+                            ∞
+                          </p>
+                        </div>
+                        <span className="text-emerald-500 text-xs font-bold uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                          Transfer
+                        </span>
+                      </div>
+                    </button>
 
-              {activeTab === "properties" && (
-                <div className="p-4 space-y-6 animate-in fade-in duration-300">
-                  <div
-                    className={`border p-4 rounded-2xl flex items-center gap-3 transition-colors ${t.card}`}
-                  >
-                    <Info size={24} className="text-emerald-500 shrink-0" />
-                    <p className={`text-xs font-medium ${t.textMuted}`}>
-                      Tap a property to buy, build, mortgage, transfer, or
-                      execute hostile takeovers. The engine handles all math.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    {state.board.map((p) => {
-                      const pState = state.propertyState[p.id] || {
-                        ownerId: null,
-                        houses: 0,
-                        mortgaged: false,
-                      };
-                      const owner = pState.ownerId
-                        ? state.players.find(
-                            (player) => player.id === pState.ownerId,
-                          )
-                        : null;
-
-                      return (
-                        <div
-                          key={p.id}
-                          onClick={() => setActivePropId(p.id)}
-                          className={`border rounded-xl p-3 flex justify-between items-center cursor-pointer transition-all duration-200 active:scale-[0.98] relative overflow-hidden ${t.card} ${t.borderHover} ${pState.mortgaged ? "opacity-60" : ""}`}
-                        >
-                          <div className="flex items-center gap-3 relative z-10 w-full">
-                            <div
-                              className="relative w-4 h-full min-h-[40px] flex items-center justify-center rounded-sm shrink-0 border border-black/10 shadow-sm overflow-hidden"
-                              style={
-                                p.color.startsWith("bg-[")
-                                  ? { backgroundColor: p.color.slice(4, -1) }
-                                  : undefined
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {state.players.map((p) => {
+                        const propsCount = Object.values(
+                          state.propertyState,
+                        ).filter((prop) => prop.ownerId === p.id).length;
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => {
+                              if (!p.isBankrupt) {
+                                setModalConfig({ activePlayerId: p.id });
+                                setTargetId(
+                                  state.players.find(
+                                    (other) =>
+                                      other.id !== p.id && !other.isBankrupt,
+                                  )?.id || "",
+                                );
                               }
-                            >
-                              {!p.color.startsWith("bg-[") && (
-                                <div
-                                  className={`absolute inset-0 ${p.color}`}
-                                />
-                              )}
-                              {p.icon &&
-                                renderDynamicIcon(
-                                  p.icon,
-                                  12,
-                                  "text-white relative z-10",
-                                )}
-                            </div>
-                            <div className="flex-1 overflow-hidden">
+                            }}
+                            className={`text-left relative overflow-hidden rounded-3xl p-5 border transition-all duration-200 active:scale-[0.97]
+                                ${p.isBankrupt ? `opacity-60 grayscale bg-neutral-500/10 ${t.border}` : `${t.card} ${t.borderHover}`}`}
+                          >
+                            <div
+                              className={`absolute top-0 left-0 w-full h-1 ${p.color.bg}`}
+                            ></div>
+                            <div className="flex justify-between items-start mb-4">
                               <span
-                                className={`font-bold text-sm block truncate leading-tight ${t.textMain}`}
+                                className={`font-bold truncate pr-2 ${t.textMain}`}
                               >
                                 {p.name}
                               </span>
-                              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                {owner ? (
-                                  <>
-                                    <span
-                                      className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${owner.color.text} ${owner.color.border} ${t.modalHeader}`}
-                                    >
-                                      {owner.name}
-                                    </span>
-                                    {p.type === "street" &&
-                                      pState.houses > 0 && (
-                                        <div className="flex gap-0.5">
-                                          {pState.houses === 5 ? (
-                                            <Building
-                                              size={12}
-                                              className="text-rose-500"
-                                              fill="currentColor"
-                                            />
-                                          ) : (
-                                            Array.from({
-                                              length: pState.houses,
-                                            }).map((_, i) => (
-                                              <Home
-                                                key={i}
-                                                size={12}
-                                                className="text-emerald-500"
-                                                fill="currentColor"
-                                              />
-                                            ))
-                                          )}
-                                        </div>
-                                      )}
-                                    {pState.mortgaged && (
-                                      <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">
-                                        Mortgaged
-                                      </span>
-                                    )}
-                                  </>
-                                ) : (
-                                  <span
-                                    className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${t.textFaint} ${t.modalHeader}`}
-                                  >
-                                    Bank • ${p.price}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "history" && (
-                <div className="p-4 animate-in fade-in duration-300">
-                  <h2
-                    className={`text-sm font-bold uppercase tracking-widest mb-4 px-2 ${t.textMuted}`}
-                  >
-                    Ledger
-                  </h2>
-                  {state.history.length === 0 ? (
-                    <div className={`text-center py-20 ${t.textFaint}`}>
-                      No transactions recorded yet.
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {state.history.map((tx) => {
-                        const isSystem = tx.type === "SYSTEM";
-                        const isBankrupt = tx.type === "BANKRUPTCY";
-                        const isProp = tx.type === "PROPERTY";
-                        const fromP = state.players.find(
-                          (p) => p.id === tx.from,
-                        );
-                        const toP = state.players.find((p) => p.id === tx.to);
-
-                        return (
-                          <div
-                            key={tx.id}
-                            className={`p-4 rounded-2xl flex items-center justify-between border transition-colors ${t.card}`}
-                          >
-                            <div className="flex items-center gap-3">
                               <div
-                                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isSystem ? "bg-slate-500/10 text-slate-500" : isBankrupt ? "bg-rose-500/10 text-rose-500" : isProp ? "bg-purple-500/10 text-purple-500" : tx.type === "B2P" ? "bg-emerald-500/10 text-emerald-500" : tx.type === "P2B" ? "bg-amber-500/10 text-amber-500" : "bg-sky-500/10 text-sky-500"}`}
-                              >
-                                {isSystem ? (
-                                  <Settings size={18} />
-                                ) : isBankrupt ? (
-                                  <AlertOctagon size={18} />
-                                ) : isProp ? (
-                                  <Home size={18} />
-                                ) : tx.type === "B2P" ? (
-                                  <TrendingUp size={18} />
-                                ) : tx.type === "P2B" ? (
-                                  <TrendingDown size={18} />
-                                ) : (
-                                  <ArrowRight size={18} />
-                                )}
-                              </div>
+                                className={`w-2.5 h-2.5 rounded-full mt-1.5 ${p.color.bg} shadow-sm`}
+                              ></div>
+                            </div>
+
+                            <div className="flex items-end justify-between mb-3">
                               <div>
-                                {isSystem || isBankrupt || isProp ? (
-                                  <p
-                                    className={`font-medium text-sm ${t.textMain}`}
-                                  >
-                                    {tx.message}
-                                  </p>
-                                ) : (
-                                  <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base font-medium">
-                                    <span
-                                      className={
-                                        fromP ? fromP.color.text : t.textFaint
-                                      }
-                                    >
-                                      {fromP ? fromP.name : "Bank"}
-                                    </span>
-                                    <span className={t.textFaint}>→</span>
-                                    <span
-                                      className={
-                                        toP ? toP.color.text : t.textFaint
-                                      }
-                                    >
-                                      {toP ? toP.name : "Bank"}
-                                    </span>
-                                  </div>
-                                )}
-                                <p className={`text-xs mt-0.5 ${t.textFaint}`}>
-                                  {new Date(tx.timestamp).toLocaleTimeString(
-                                    [],
-                                    { hour: "2-digit", minute: "2-digit" },
-                                  )}
-                                </p>
+                                <span
+                                  className={`text-[10px] font-bold uppercase tracking-widest block mb-0.5 ${t.textMuted}`}
+                                >
+                                  Balance
+                                </span>
+                                <span
+                                  className={`text-2xl font-black tracking-tight ${p.isBankrupt ? "line-through opacity-50" : p.balance < 0 ? "text-rose-500" : t.textMain}`}
+                                >
+                                  ${p.balance.toLocaleString()}
+                                </span>
                               </div>
+                              {p.debt > 0 && (
+                                <div className="text-right">
+                                  <span className="text-rose-500/70 text-[10px] font-bold uppercase tracking-widest block mb-0.5">
+                                    Debt
+                                  </span>
+                                  <span className="text-sm font-black text-rose-500">
+                                    -${p.debt.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
                             </div>
-                            {(!isSystem || tx.amount > 0) && !isBankrupt && (
-                              <div
-                                className={`font-black text-lg ${t.textMain}`}
-                              >
-                                ${tx.amount.toLocaleString()}
+
+                            <div
+                              className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg w-max border ${t.textMuted} ${t.modalHeader}`}
+                            >
+                              <Home size={10} /> {propsCount} Assets
+                            </div>
+                            {p.isBankrupt && (
+                              <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] flex items-center justify-center">
+                                <span className="bg-rose-500 text-white font-black px-3 py-1 rounded shadow-lg text-xs uppercase tracking-widest rotate-[-10deg]">
+                                  Bankrupt
+                                </span>
                               </div>
                             )}
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "settings" && (
-                <div className="p-4 space-y-4 animate-in fade-in duration-300">
-                  <div
-                    className={`border rounded-3xl p-6 transition-colors ${t.card}`}
-                  >
-                    <h3
-                      className={`font-bold mb-1 flex items-center justify-between ${t.textMain}`}
-                    >
-                      <span>App Theme</span>
-                      <Palette size={18} className="text-emerald-500" />
-                    </h3>
-                    <p className={`text-sm mb-4 ${t.textMuted}`}>
-                      Select your preferred visual style.
-                    </p>
-                    <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "dark" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "dark" ? "border-emerald-500 ring-1 ring-emerald-500 text-white bg-neutral-800" : t.input}`}
-                      >
-                        Dark
-                      </button>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "light" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "light" ? "border-emerald-500 ring-1 ring-emerald-500 text-slate-900 bg-white" : t.input}`}
-                      >
-                        Light
-                      </button>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "midnight" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "midnight" ? "border-emerald-500 ring-1 ring-emerald-500 text-slate-100 bg-[#1e293b]" : t.input}`}
-                      >
-                        Midnight
-                      </button>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "coffee" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "coffee" ? "border-emerald-500 ring-1 ring-emerald-500 text-[#fafaf9] bg-[#44403c]" : t.input}`}
-                      >
-                        Coffee
-                      </button>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "ocean" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "ocean" ? "border-emerald-500 ring-1 ring-emerald-500 text-sky-50 bg-[#0c4a6e]" : t.input}`}
-                      >
-                        Ocean
-                      </button>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "forest" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "forest" ? "border-emerald-500 ring-1 ring-emerald-500 text-emerald-50 bg-[#065f46]" : t.input}`}
-                      >
-                        Forest
-                      </button>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { theme: "cyberpunk" },
-                          })
-                        }
-                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "cyberpunk" ? "border-emerald-500 ring-1 ring-emerald-500 text-[#fdf4ff] bg-[#27272a]" : t.input}`}
-                      >
-                        Cyberpunk
-                      </button>
-                    </div>
                   </div>
+                )}
 
-                  <div
-                    className={`border rounded-3xl p-6 transition-colors ${t.card}`}
-                  >
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <h3 className={`font-bold ${t.textMain}`}>
-                          Debt System
-                        </h3>
-                        <p className={`text-xs ${t.textMuted}`}>
-                          Enable player loans.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: { enableDebt: !state.settings.enableDebt },
-                          })
-                        }
-                        className={`w-12 h-6 rounded-full transition-colors relative ${state.settings.enableDebt ? "bg-emerald-500" : isDark ? "bg-neutral-700" : "bg-slate-300"}`}
-                      >
-                        <div
-                          className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${state.settings.enableDebt ? "translate-x-6" : "translate-x-0"}`}
-                        />
-                      </button>
-                    </div>
-
-                    {state.settings.enableDebt && (
-                      <div
-                        className={`pt-4 border-t animate-in fade-in slide-in-from-top-2 ${t.border}`}
-                      >
-                        <div className="flex justify-between items-center mb-3">
-                          <span className={`text-sm font-bold ${t.textMain}`}>
-                            Custom Debt Limit
-                          </span>
-                          <button
-                            onClick={() =>
-                              dispatch({
-                                type: "UPDATE_SETTINGS",
-                                payload: {
-                                  enableDebtLimit:
-                                    !state.settings.enableDebtLimit,
-                                },
-                              })
-                            }
-                            className={`w-10 h-5 rounded-full transition-colors relative ${state.settings.enableDebtLimit ? "bg-sky-500" : isDark ? "bg-neutral-700" : "bg-slate-300"}`}
-                          >
-                            <div
-                              className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${state.settings.enableDebtLimit ? "translate-x-5" : "translate-x-0"}`}
-                            />
-                          </button>
-                        </div>
-                        {state.settings.enableDebtLimit && (
-                          <div
-                            className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${t.input}`}
-                          >
-                            <span className="text-sky-500 font-bold">$</span>
-                            <input
-                              type="number"
-                              value={state.settings.maxDebt}
-                              onChange={(e) =>
-                                dispatch({
-                                  type: "UPDATE_SETTINGS",
-                                  payload: {
-                                    maxDebt: parseInt(e.target.value, 10) || 0,
-                                  },
-                                })
-                              }
-                              className={`bg-transparent font-black w-full focus:outline-none ${t.textMain}`}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div
-                    className={`border rounded-3xl p-6 transition-colors ${t.card}`}
-                  >
-                    <h3 className={`font-bold mb-1 ${t.textMain}`}>
-                      Unmortgage Penalty
-                    </h3>
-                    <p className={`text-sm mb-4 ${t.textMuted}`}>
-                      Custom interest % when unmortgaging a property.
-                    </p>
+                {activeTab === "properties" && (
+                  <div className="p-4 space-y-6 animate-in fade-in duration-300">
                     <div
-                      className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${t.input}`}
+                      className={`border p-4 rounded-2xl flex items-center gap-3 transition-colors ${t.card}`}
                     >
-                      <input
-                        type="number"
-                        value={state.settings.unmortgageInterest ?? 10}
-                        onChange={(e) =>
-                          dispatch({
-                            type: "UPDATE_SETTINGS",
-                            payload: {
-                              unmortgageInterest:
-                                parseInt(e.target.value, 10) || 0,
-                            },
-                          })
-                        }
-                        className={`bg-transparent font-black w-full focus:outline-none ${t.textMain}`}
-                      />
-                      <span className="text-emerald-500 font-bold">%</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => setIsEditingBoard(true)}
-                      className={`border font-bold py-4 rounded-3xl transition-all duration-200 hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center gap-2 ${t.card} ${t.textMain} ${t.borderHover}`}
-                    >
-                      <Edit3 size={24} className="text-sky-500" /> Customize
-                      Board
-                    </button>
-                    <button
-                      onClick={handleExport}
-                      className={`border font-bold py-4 rounded-3xl transition-all duration-200 hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center gap-2 ${t.card} ${t.textMain} ${t.borderHover}`}
-                    >
-                      <Upload size={24} className="text-emerald-500" /> Export
-                      Save Data
-                    </button>
-                  </div>
-
-                  <div
-                    className={`border rounded-3xl p-6 transition-colors ${t.card}`}
-                  >
-                    <h3
-                      className={`font-bold mb-4 flex items-center gap-2 ${t.textMain}`}
-                    >
-                      <Info size={18} className="text-emerald-500" /> About
-                      B.A.B.E.
-                    </h3>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className={`font-bold ${t.textMain}`}>
-                          Version 5.4.0
-                        </p>
-                        <p className={`text-sm ${t.textMuted}`}>
-                          Developed by Yousuf with AI
-                        </p>
-                      </div>
-                      <a
-                        href="https://github.com/ntiqueC0de"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`p-3 rounded-full border transition-all duration-200 hover:scale-[1.05] active:scale-95 ${t.card} ${t.textMain} ${t.borderHover}`}
-                      >
-                        <Github size={24} />
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="bg-rose-500/10 rounded-3xl p-6 border border-rose-500/20">
-                    <h3 className="text-rose-500 font-bold mb-4 flex items-center gap-2">
-                      <AlertOctagon size={18} /> Danger Zone
-                    </h3>
-                    <button
-                      onClick={() => setEndGameConfirm(true)}
-                      className="w-full bg-amber-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all mb-3"
-                    >
-                      End Game & Rank Players
-                    </button>
-                    <button
-                      onClick={() => setResetConfirm(true)}
-                      className="w-full bg-rose-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                    >
-                      Reset App
-                    </button>
-                  </div>
-                </div>
-              )}
-            </main>
-
-            <nav
-              className={`backdrop-blur-xl border-t px-6 py-4 flex justify-between items-center absolute bottom-0 w-full z-20 pb-safe transition-colors duration-300 ${t.nav}`}
-            >
-              {[
-                { id: "board", icon: Users, label: "Bank" },
-                { id: "properties", icon: Home, label: "Assets" },
-                { id: "history", icon: HistoryIcon, label: "Ledger" },
-                { id: "settings", icon: Settings, label: "Settings" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex flex-col items-center gap-1.5 w-16 transition-colors duration-200 ${activeTab === tab.id ? (isDark ? "text-white" : "text-slate-900") : t.textMuted}`}
-                >
-                  <tab.icon
-                    size={22}
-                    className={
-                      activeTab === tab.id
-                        ? isDark
-                          ? "drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-transform scale-110"
-                          : "transition-transform scale-110"
-                        : "transition-transform scale-100"
-                    }
-                  />
-                  <span className="text-[9px] font-black uppercase tracking-widest">
-                    {tab.label}
-                  </span>
-                </button>
-              ))}
-            </nav>
-
-            {/* TOAST - Fixed to viewport */}
-            <div
-              className={`fixed top-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-300 pointer-events-none ease-out w-max max-w-[90vw] ${toast ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95"}`}
-            >
-              {toast && (
-                <div
-                  className={`px-4 py-3 rounded-2xl font-bold shadow-2xl flex items-center gap-2 text-sm ${toast.type === "error" ? "bg-rose-500 text-white shadow-rose-500/30" : "bg-emerald-500 text-white shadow-emerald-500/30"}`}
-                >
-                  {toast.type === "error" ? (
-                    <AlertOctagon size={16} className="shrink-0" />
-                  ) : (
-                    <Check size={16} className="shrink-0" />
-                  )}
-                  <span className="truncate">{toast.msg}</span>
-                </div>
-              )}
-            </div>
-
-            {/* BANK MODAL */}
-            {bankModal && (
-              <div
-                className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
-              >
-                <div
-                  className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[95vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
-                >
-                  <div
-                    className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b ${t.modalHeader}`}
-                  >
-                    <div>
-                      <h3 className={`font-bold leading-tight ${t.textMain}`}>
-                        Central Bank
-                      </h3>
-                      <span
-                        className={`text-xs uppercase font-bold tracking-widest ${t.textMuted}`}
-                      >
-                        Bank Transfer
-                      </span>
-                    </div>
-                    <button
-                      onClick={closeModals}
-                      className={`p-3 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  <div className="p-6 flex-1 overflow-y-auto hide-scrollbar">
-                    <div className="mb-6">
-                      <label
-                        className={`text-[10px] font-bold uppercase tracking-widest mb-3 block ${t.textMuted}`}
-                      >
-                        Recipient (Push Money To)
-                      </label>
-                      <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
-                        {state.players
-                          .filter((p) => !p.isBankrupt)
-                          .map((p) => (
-                            <button
-                              key={p.id}
-                              onClick={() => setTargetId(p.id)}
-                              className={`flex-shrink-0 px-4 py-2.5 rounded-xl border transition-all duration-200 ${targetId === p.id ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 scale-105" : `${t.input} ${t.textFaint} hover:border-emerald-500/50`}`}
-                            >
-                              {p.name}
-                            </button>
-                          ))}
-                      </div>
-                    </div>
-
-                    <div
-                      className={`mb-6 rounded-2xl border p-4 flex flex-col items-center justify-center min-h-[100px] relative transition-colors ${t.card}`}
-                    >
-                      <div
-                        className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest ${t.textFaint}`}
-                      >
-                        Amount
-                      </div>
-                      <div className="flex items-start justify-center gap-1">
-                        <span
-                          className={`text-2xl mt-2 font-bold ${t.textMuted}`}
-                        >
-                          $
-                        </span>
-                        <span
-                          className={`text-6xl font-black tracking-tighter truncate max-w-[250px] ${amountStr === "0" ? t.textFaint : "text-emerald-500"}`}
-                        >
-                          {parseInt(amountStr || 0, 10).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 mb-6">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                        <button
-                          key={num}
-                          onClick={() => handleNumpad(num.toString())}
-                          className={`py-4 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
-                        >
-                          {num}
-                        </button>
-                      ))}
-                      <button
-                        onClick={() => handleNumpad("00")}
-                        className={`py-4 rounded-2xl text-lg font-black transition-all ${t.numpad}`}
-                      >
-                        00
-                      </button>
-                      <button
-                        onClick={() => handleNumpad("0")}
-                        className={`py-4 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
-                      >
-                        0
-                      </button>
-                      <button
-                        onClick={() => handleNumpad("DEL")}
-                        className={`py-4 rounded-2xl flex items-center justify-center transition-all ${t.numpadDel}`}
-                      >
-                        <X size={24} strokeWidth={3} />
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        if (!targetId || amountStr === "0") return;
-                        dispatch({ type: "CLEAR_ERROR" });
-                        dispatch({
-                          type: "TRANSACT",
-                          payload: {
-                            from: "BANK",
-                            to: targetId,
-                            amount: amountStr,
-                            type: "B2P",
-                            msgOverride: "Bank transferred Go Cash/Bonus",
-                          },
-                        });
-                      }}
-                      disabled={!targetId || amountStr === "0"}
-                      className={`w-full py-5 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200 ${!targetId || amountStr === "0" ? "opacity-50 cursor-not-allowed " + t.input : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95"}`}
-                    >
-                      <Check size={24} strokeWidth={3} /> Send to Player
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* AUTO BANKRUPTCY POPUP */}
-            {state.pendingBankruptcy &&
-              (() => {
-                const p = state.players.find(
-                  (p) => p.id === state.pendingBankruptcy,
-                );
-                return (
-                  <div
-                    className={`fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
-                  >
-                    <div
-                      className={`border border-rose-500/50 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 ease-out ${t.modalBg}`}
-                    >
-                      <div className="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mb-4 ring-2 ring-rose-500/20">
-                        <AlertOctagon size={32} />
-                      </div>
-                      <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
-                        Zero Balance Reached
-                      </h2>
-                      <p className={`text-sm mb-6 ${t.textMuted}`}>
-                        <strong className={t.textMain}>{p.name}</strong> has
-                        exactly $0. Raise funds or declare bankruptcy.
+                      <Info size={24} className="text-emerald-500 shrink-0" />
+                      <p className={`text-xs font-medium ${t.textMuted}`}>
+                        Tap a property to buy, build, mortgage, transfer, or
+                        execute hostile takeovers. The engine handles all math.
                       </p>
-                      <div className="flex flex-col gap-3 w-full">
-                        <button
-                          onClick={() =>
-                            dispatch({ type: "DISMISS_BANKRUPTCY" })
-                          }
-                          className={`w-full py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                        >
-                          Resolve Debt Manually
-                        </button>
-                        <button
-                          onClick={() => {
-                            dispatch({
-                              type: "BANKRUPT_PLAYER",
-                              payload: p.id,
-                            });
-                            showToast(`${p.name} is bankrupt`, "error");
-                          }}
-                          className="w-full py-3 bg-rose-500/10 text-rose-500 font-bold rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-all duration-200 active:scale-95"
-                        >
-                          Declare Bankrupt
-                        </button>
-                        <button
-                          onClick={() => {
-                            dispatch({
-                              type: "BANKRUPT_PLAYER",
-                              payload: p.id,
-                            });
-                            dispatch({ type: "END_GAME_RANKING" });
-                          }}
-                          className="w-full py-3 bg-rose-600 text-white font-bold rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                        >
-                          Declare Bankrupt & End Game
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                );
-              })()}
 
-            {/* END GAME CONFIRM MODAL */}
-            {resetConfirm && (
-              <div
-                className={`fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
-              >
-                <div
-                  className={`border border-rose-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
-                >
-                  <div className="text-center mb-6">
-                    <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
-                      Reset Game?
-                    </h2>
-                    <p className={`text-sm ${t.textMuted}`}>
-                      This will wipe all progress and return to setup.
-                    </p>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setResetConfirm(false)}
-                      className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => {
-                        dispatch({ type: "RESET_GAME" });
-                        setResetConfirm(false);
-                      }}
-                      className="flex-1 py-3 bg-rose-600 text-white font-black rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+                    <div className="space-y-2">
+                      {state.board.map((p) => {
+                        const pState = state.propertyState[p.id] || {
+                          ownerId: null,
+                          houses: 0,
+                          mortgaged: false,
+                        };
+                        const owner = pState.ownerId
+                          ? state.players.find(
+                              (player) => player.id === pState.ownerId,
+                            )
+                          : null;
 
-            {endGameConfirm && (
-              <div
-                className={`fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
-              >
-                <div
-                  className={`border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
-                >
-                  <div className="text-center mb-6">
-                    <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
-                      End Game?
-                    </h2>
-                    <p className={`text-sm ${t.textMuted}`}>
-                      Calculate final net worths and crown a winner.
-                    </p>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setEndGameConfirm(false)}
-                      className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => {
-                        dispatch({ type: "END_GAME_RANKING" });
-                        setEndGameConfirm(false);
-                      }}
-                      className="flex-1 py-3 bg-amber-500 text-white font-black rounded-xl shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                    >
-                      End Game
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* PROPERTY MODAL */}
-            {activePropId &&
-              (() => {
-                const propDef = state.board.find((p) => p.id === activePropId);
-                const pState = state.propertyState[activePropId] || {
-                  ownerId: null,
-                  houses: 0,
-                  mortgaged: false,
-                };
-                const isOwned = !!pState.ownerId;
-                const owner = isOwned
-                  ? state.players.find((p) => p.id === pState.ownerId)
-                  : null;
-                const unmortgageCost = Math.ceil(
-                  propDef.mort *
-                    (1 + (state.settings.unmortgageInterest ?? 10) / 100),
-                );
-
-                const handlePropAction = () => {
-                  dispatch({ type: "CLEAR_ERROR" });
-
-                  // Pre-Transaction UI Barrier
-                  let cost = 0;
-                  if (propConfirmAction.type === "BUY") cost = propDef.price;
-                  if (propConfirmAction.type === "BUILD") cost = propDef.build;
-                  if (propConfirmAction.type === "UNMORTGAGE")
-                    cost = unmortgageCost;
-                  if (propConfirmAction.type === "HOSTILE_TAKEOVER")
-                    cost = propDef.price * 2;
-
-                  const activePlayerToCheck =
-                    propConfirmAction.type === "HOSTILE_TAKEOVER"
-                      ? state.players.find(
-                          (p) => p.id === propConfirmAction.playerId,
-                        )
-                      : propConfirmAction.type === "BUY"
-                        ? state.players.find(
-                            (p) => p.id === propConfirmAction.playerId,
-                          )
-                        : owner;
-
-                  if (cost > 0 && activePlayerToCheck.balance < cost) {
-                    showToast(`Insufficient funds! Need $${cost}.`, "error");
-                    setPropConfirmAction(null);
-                    return;
-                  }
-
-                  // Specific Debt Block for Real Estate
-                  if (
-                    (propConfirmAction.type === "BUY" ||
-                      propConfirmAction.type === "BUILD") &&
-                    activePlayerToCheck.debt > 0
-                  ) {
-                    showToast(
-                      "Cannot buy/build while in debt. Repay loan first.",
-                      "error",
-                    );
-                    setPropConfirmAction(null);
-                    return;
-                  }
-
-                  if (propConfirmAction.type === "HOSTILE_TAKEOVER") {
-                    dispatch({
-                      type: "HOSTILE_TAKEOVER",
-                      payload: {
-                        propertyId: activePropId,
-                        buyerId: propConfirmAction.playerId,
-                      },
-                    });
-                  } else {
-                    dispatch({
-                      type: "PROPERTY_ACTION",
-                      payload: {
-                        actionType: propConfirmAction.type,
-                        propertyId: activePropId,
-                        playerId: propConfirmAction.playerId,
-                        amount: propConfirmAction.amount,
-                        targetPlayerId: propConfirmAction.targetId,
-                      },
-                    });
-                  }
-                };
-
-                return (
-                  <div
-                    className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out p-4 ${t.modalOverlay}`}
-                  >
-                    <div
-                      className={`w-full max-w-sm rounded-3xl border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 ease-out relative ${t.modalBg}`}
-                    >
-                      {propConfirmAction && (
-                        <div
-                          className={`absolute inset-0 z-[70] backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in text-center bg-opacity-95 ${t.modalBg}`}
-                        >
-                          <h3
-                            className={`text-xl font-black mb-2 ${t.textMain}`}
+                        return (
+                          <div
+                            key={p.id}
+                            onClick={() => setActivePropId(p.id)}
+                            className={`border rounded-xl p-3 flex justify-between items-center cursor-pointer transition-all duration-200 active:scale-[0.98] relative overflow-hidden ${t.card} ${t.borderHover} ${pState.mortgaged ? "opacity-60" : ""}`}
                           >
-                            Confirm Action
-                          </h3>
-                          <p className={`mb-6 text-sm ${t.textMuted}`}>
-                            {propConfirmAction.type === "BUY" &&
-                              `Buy for $${propConfirmAction.amount}?`}
-                            {propConfirmAction.type === "BUILD" &&
-                              `Build for $${propConfirmAction.amount}?`}
-                            {propConfirmAction.type === "SELL_BUILD" &&
-                              `Sell for $${propConfirmAction.amount}?`}
-                            {propConfirmAction.type === "MORTGAGE" &&
-                              `Mortgage and receive $${propConfirmAction.amount}?`}
-                            {propConfirmAction.type === "UNMORTGAGE" &&
-                              `Unmortgage for $${propConfirmAction.amount}?`}
-                            {propConfirmAction.type === "TRANSFER" &&
-                              `Transfer ownership to selected player?`}
-                            {propConfirmAction.type === "HOSTILE_TAKEOVER" &&
-                              `Pay $${propConfirmAction.amount} to seize asset?`}
-                          </p>
-                          <div className="flex gap-3 w-full">
-                            <button
-                              onClick={() => {
-                                setPropConfirmAction(null);
-                                dispatch({ type: "CLEAR_ERROR" });
-                              }}
-                              className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={handlePropAction}
-                              className="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                            >
-                              Confirm
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      <div
-                        className={`${propDef.color.startsWith("bg-[") ? propDef.color : propDef.color.replace("bg-", "bg-")} ${propDef.text || "text-white"} p-6 relative border-b border-black/10 flex items-center gap-3`}
-                      >
-                        <button
-                          onClick={closeModals}
-                          className="absolute top-2 right-2 p-3 z-[60] bg-black/20 hover:bg-black/40 rounded-full transition-colors backdrop-blur-md text-white"
-                        >
-                          <X size={20} />
-                        </button>
-                        {propDef.icon &&
-                          renderDynamicIcon(
-                            propDef.icon,
-                            32,
-                            "opacity-50 shrink-0",
-                          )}
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">
-                            Title Deed
-                          </p>
-                          <h2 className="text-2xl font-black leading-tight">
-                            {propDef.name}
-                          </h2>
-                        </div>
-                      </div>
-
-                      <div className="p-6 space-y-6">
-                        {!isOwned ? (
-                          <div className="space-y-4">
-                            <div className="text-center">
-                              <span
-                                className={`text-sm font-bold block mb-1 ${t.textMuted}`}
+                            <div className="flex items-center gap-3 relative z-10 w-full">
+                              <div
+                                className="relative w-4 h-full min-h-[40px] flex items-center justify-center rounded-sm shrink-0 border border-black/10 shadow-sm overflow-hidden"
+                                style={
+                                  p.color.startsWith("bg-[")
+                                    ? { backgroundColor: p.color.slice(4, -1) }
+                                    : undefined
+                                }
                               >
-                                Purchase Price
-                              </span>
-                              <span
-                                className={`text-4xl font-black ${t.textMain}`}
-                              >
-                                ${propDef.price}
-                              </span>
-                            </div>
-                            <div>
-                              <label
-                                className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
-                              >
-                                Select Buyer
-                              </label>
-                              <div className="grid grid-cols-2 gap-2">
-                                {state.players
-                                  .filter((p) => !p.isBankrupt)
-                                  .map((p) => (
-                                    <button
-                                      key={p.id}
-                                      onClick={() =>
-                                        setPropConfirmAction({
-                                          type: "BUY",
-                                          playerId: p.id,
-                                          amount: propDef.price,
-                                        })
-                                      }
-                                      className={`py-3 rounded-xl border flex flex-col items-center gap-1 transition-all duration-200 active:scale-95 ${t.input} ${t.borderHover}`}
-                                    >
-                                      <span
-                                        className={`w-2 h-2 rounded-full ${p.color.bg}`}
-                                      ></span>
-                                      <span
-                                        className={`text-xs font-bold truncate w-full text-center px-1 ${t.textMain}`}
-                                      >
-                                        {p.name}
-                                      </span>
-                                    </button>
-                                  ))}
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-5">
-                            <div
-                              className={`flex justify-between items-center p-3 rounded-xl border transition-colors ${t.modalHeader}`}
-                            >
-                              <span
-                                className={`text-xs font-bold ${t.textMuted}`}
-                              >
-                                Owner
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`w-2 h-2 rounded-full ${owner.color.bg}`}
-                                ></span>
-                                <span
-                                  className={`font-bold text-sm ${t.textMain}`}
-                                >
-                                  {owner.name}
-                                </span>
-                              </div>
-                            </div>
-
-                            {pState.mortgaged ? (
-                              <div className="text-center space-y-4">
-                                <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl">
-                                  <AlertOctagon
-                                    size={24}
-                                    className="text-rose-500 mx-auto mb-2"
+                                {!p.color.startsWith("bg-[") && (
+                                  <div
+                                    className={`absolute inset-0 ${p.color}`}
                                   />
-                                  <span className="text-rose-500 font-bold block">
-                                    Property Mortgaged
-                                  </span>
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    setPropConfirmAction({
-                                      type: "UNMORTGAGE",
-                                      playerId: owner.id,
-                                      amount: unmortgageCost,
-                                    })
-                                  }
-                                  className="w-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all duration-200"
-                                >
-                                  Unmortgage (${unmortgageCost})
-                                </button>
-
-                                <div
-                                  className={`pt-4 border-t text-left ${t.border}`}
-                                >
-                                  <label className="text-[10px] text-rose-500 font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                    <Swords size={12} /> Hostile Takeover (2x
-                                    Price)
-                                  </label>
-                                  <div className="grid grid-cols-2 gap-2">
-                                    {state.players
-                                      .filter(
-                                        (p) =>
-                                          p.id !== owner.id && !p.isBankrupt,
-                                      )
-                                      .map((p) => (
-                                        <button
-                                          key={p.id}
-                                          onClick={() =>
-                                            setPropConfirmAction({
-                                              type: "HOSTILE_TAKEOVER",
-                                              playerId: p.id,
-                                              amount: propDef.price * 2,
-                                            })
-                                          }
-                                          className="px-3 py-2 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-95"
-                                        >
-                                          <div className="flex items-center gap-1">
-                                            <span
-                                              className={`w-2 h-2 rounded-full ${p.color.bg}`}
-                                            ></span>
-                                            <span
-                                              className={`text-xs font-bold ${isDark ? "text-rose-300" : "text-rose-600"}`}
-                                            >
-                                              {p.name}
-                                            </span>
-                                          </div>
-                                        </button>
-                                      ))}
-                                  </div>
-                                </div>
+                                )}
+                                {p.icon &&
+                                  renderDynamicIcon(
+                                    p.icon,
+                                    12,
+                                    "text-white relative z-10",
+                                  )}
                               </div>
-                            ) : (
-                              <div className="space-y-3">
-                                {propDef.type === "street" &&
-                                  (() => {
-                                    const groupProps = state.board.filter(
-                                      (b) => b.group === propDef.group,
-                                    );
-                                    const hasMonopoly = groupProps.every(
-                                      (b) =>
-                                        state.propertyState[b.id]?.ownerId ===
-                                        owner.id,
-                                    );
-                                    const anyMortgagedInGroup = groupProps.some(
-                                      (b) =>
-                                        state.propertyState[b.id]?.mortgaged,
-                                    );
-                                    const canBuild =
-                                      hasMonopoly && !anyMortgagedInGroup;
-
-                                    return (
-                                      <div
-                                        className={`p-4 rounded-xl border transition-colors ${t.modalHeader}`}
+                              <div className="flex-1 overflow-hidden">
+                                <span
+                                  className={`font-bold text-sm block truncate leading-tight ${t.textMain}`}
+                                >
+                                  {p.name}
+                                </span>
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  {owner ? (
+                                    <>
+                                      <span
+                                        className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${owner.color.text} ${owner.color.border} ${t.modalHeader}`}
                                       >
-                                        <div className="flex justify-between items-center mb-4">
-                                          <span
-                                            className={`text-xs font-bold ${t.textMuted}`}
-                                          >
-                                            Development
-                                          </span>
-                                          <div className="flex gap-1">
+                                        {owner.name}
+                                      </span>
+                                      {p.type === "street" &&
+                                        pState.houses > 0 && (
+                                          <div className="flex gap-0.5">
                                             {pState.houses === 5 ? (
                                               <Building
-                                                size={16}
+                                                size={12}
                                                 className="text-rose-500"
                                                 fill="currentColor"
                                               />
@@ -3024,114 +2333,810 @@ export default function App() {
                                               }).map((_, i) => (
                                                 <Home
                                                   key={i}
-                                                  size={16}
+                                                  size={12}
                                                   className="text-emerald-500"
                                                   fill="currentColor"
                                                 />
                                               ))
                                             )}
-                                            {pState.houses === 0 && (
-                                              <span
-                                                className={`text-xs font-bold ${t.textFaint}`}
-                                              >
-                                                Empty Lot
-                                              </span>
-                                            )}
                                           </div>
-                                        </div>
-                                        <div className="flex gap-2 flex-col sm:flex-row">
-                                          <button
-                                            onClick={() =>
-                                              setPropConfirmAction({
-                                                type: "BUILD",
-                                                playerId: owner.id,
-                                                amount: propDef.build,
-                                              })
-                                            }
-                                            disabled={
-                                              pState.houses >= 5 || !canBuild
-                                            }
-                                            className={`flex-1 disabled:opacity-50 text-emerald-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-emerald-500/50`}
-                                          >
-                                            Build (${propDef.build})
-                                          </button>
-                                          <button
-                                            onClick={() =>
-                                              setPropConfirmAction({
-                                                type: "SELL_BUILD",
-                                                playerId: owner.id,
-                                                amount: propDef.build / 2,
-                                              })
-                                            }
-                                            disabled={pState.houses === 0}
-                                            className={`flex-1 disabled:opacity-50 text-rose-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-rose-500/50`}
-                                          >
-                                            Sell (${propDef.build / 2})
-                                          </button>
-                                        </div>
-                                        {!hasMonopoly ? (
-                                          <p
-                                            className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
-                                          >
-                                            Requires full {propDef.group} set to
-                                            build.
-                                          </p>
-                                        ) : anyMortgagedInGroup ? (
-                                          <p
-                                            className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
-                                          >
-                                            Cannot build while a {propDef.group}{" "}
-                                            property is mortgaged.
-                                          </p>
-                                        ) : null}
-                                      </div>
-                                    );
-                                  })()}
-                                <button
-                                  onClick={() =>
-                                    setPropConfirmAction({
-                                      type: "MORTGAGE",
-                                      playerId: owner.id,
-                                      amount: propDef.mort,
-                                    })
-                                  }
-                                  disabled={pState.houses > 0}
-                                  className={`w-full disabled:opacity-50 text-amber-500 font-bold py-3 rounded-xl transition-all duration-200 active:scale-95 border ${t.input} hover:border-amber-500/50`}
-                                >
-                                  Mortgage to Bank (+${propDef.mort})
-                                </button>
+                                        )}
+                                      {pState.mortgaged && (
+                                        <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">
+                                          Mortgaged
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span
+                                      className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${t.textFaint} ${t.modalHeader}`}
+                                    >
+                                      Bank • ${p.price}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                            )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
-                            {!pState.mortgaged && (
-                              <div className={`pt-4 border-t ${t.border}`}>
-                                <label
-                                  className={`text-[10px] font-bold uppercase tracking-widest mb-2 block flex items-center gap-1 ${t.textMuted}`}
+                {activeTab === "history" && (
+                  <div className="p-4 animate-in fade-in duration-300">
+                    <h2
+                      className={`text-sm font-bold uppercase tracking-widest mb-4 px-2 ${t.textMuted}`}
+                    >
+                      Ledger
+                    </h2>
+                    {state.history.length === 0 ? (
+                      <div className={`text-center py-20 ${t.textFaint}`}>
+                        No transactions recorded yet.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {state.history.map((tx) => {
+                          const isSystem = tx.type === "SYSTEM";
+                          const isBankrupt = tx.type === "BANKRUPTCY";
+                          const isProp = tx.type === "PROPERTY";
+                          const fromP = state.players.find(
+                            (p) => p.id === tx.from,
+                          );
+                          const toP = state.players.find((p) => p.id === tx.to);
+
+                          return (
+                            <div
+                              key={tx.id}
+                              className={`p-4 rounded-2xl flex items-center justify-between border transition-colors ${t.card}`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isSystem ? "bg-slate-500/10 text-slate-500" : isBankrupt ? "bg-rose-500/10 text-rose-500" : isProp ? "bg-purple-500/10 text-purple-500" : tx.type === "B2P" ? "bg-emerald-500/10 text-emerald-500" : tx.type === "P2B" ? "bg-amber-500/10 text-amber-500" : "bg-sky-500/10 text-sky-500"}`}
                                 >
-                                  <Handshake size={12} /> Trade Property To...
+                                  {isSystem ? (
+                                    <Settings size={18} />
+                                  ) : isBankrupt ? (
+                                    <AlertOctagon size={18} />
+                                  ) : isProp ? (
+                                    <Home size={18} />
+                                  ) : tx.type === "B2P" ? (
+                                    <TrendingUp size={18} />
+                                  ) : tx.type === "P2B" ? (
+                                    <TrendingDown size={18} />
+                                  ) : (
+                                    <ArrowRight size={18} />
+                                  )}
+                                </div>
+                                <div>
+                                  {isSystem || isBankrupt || isProp ? (
+                                    <p
+                                      className={`font-medium text-sm ${t.textMain}`}
+                                    >
+                                      {tx.message}
+                                    </p>
+                                  ) : (
+                                    <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base font-medium">
+                                      <span
+                                        className={
+                                          fromP ? fromP.color.text : t.textFaint
+                                        }
+                                      >
+                                        {fromP ? fromP.name : "Bank"}
+                                      </span>
+                                      <span className={t.textFaint}>→</span>
+                                      <span
+                                        className={
+                                          toP ? toP.color.text : t.textFaint
+                                        }
+                                      >
+                                        {toP ? toP.name : "Bank"}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <p
+                                    className={`text-xs mt-0.5 ${t.textFaint}`}
+                                  >
+                                    {new Date(tx.timestamp).toLocaleTimeString(
+                                      [],
+                                      { hour: "2-digit", minute: "2-digit" },
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              {(!isSystem || tx.amount > 0) && !isBankrupt && (
+                                <div
+                                  className={`font-black text-lg ${t.textMain}`}
+                                >
+                                  ${tx.amount.toLocaleString()}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === "settings" && (
+                  <div className="p-4 space-y-4 animate-in fade-in duration-300">
+                    <div
+                      className={`border rounded-3xl p-6 transition-colors ${t.card}`}
+                    >
+                      <h3
+                        className={`font-bold mb-1 flex items-center justify-between ${t.textMain}`}
+                      >
+                        <span>App Theme</span>
+                        <Palette size={18} className="text-emerald-500" />
+                      </h3>
+                      <p className={`text-sm mb-4 ${t.textMuted}`}>
+                        Select your preferred visual style.
+                      </p>
+                      <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "dark" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "dark" ? "border-emerald-500 ring-1 ring-emerald-500 text-white bg-neutral-800" : t.input}`}
+                        >
+                          Dark
+                        </button>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "light" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "light" ? "border-emerald-500 ring-1 ring-emerald-500 text-slate-900 bg-white" : t.input}`}
+                        >
+                          Light
+                        </button>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "midnight" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "midnight" ? "border-emerald-500 ring-1 ring-emerald-500 text-slate-100 bg-[#1e293b]" : t.input}`}
+                        >
+                          Midnight
+                        </button>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "coffee" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "coffee" ? "border-emerald-500 ring-1 ring-emerald-500 text-[#fafaf9] bg-[#44403c]" : t.input}`}
+                        >
+                          Coffee
+                        </button>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "ocean" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "ocean" ? "border-emerald-500 ring-1 ring-emerald-500 text-sky-50 bg-[#0c4a6e]" : t.input}`}
+                        >
+                          Ocean
+                        </button>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "forest" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "forest" ? "border-emerald-500 ring-1 ring-emerald-500 text-emerald-50 bg-[#065f46]" : t.input}`}
+                        >
+                          Forest
+                        </button>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: { theme: "cyberpunk" },
+                            })
+                          }
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl font-bold border transition-all duration-200 active:scale-95 ${state.settings.theme === "cyberpunk" ? "border-emerald-500 ring-1 ring-emerald-500 text-[#fdf4ff] bg-[#27272a]" : t.input}`}
+                        >
+                          Cyberpunk
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`border rounded-3xl p-6 transition-colors ${t.card}`}
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h3 className={`font-bold ${t.textMain}`}>
+                            Debt System
+                          </h3>
+                          <p className={`text-xs ${t.textMuted}`}>
+                            Enable player loans.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: {
+                                enableDebt: !state.settings.enableDebt,
+                              },
+                            })
+                          }
+                          className={`w-12 h-6 rounded-full transition-colors relative ${state.settings.enableDebt ? "bg-emerald-500" : isDark ? "bg-neutral-700" : "bg-slate-300"}`}
+                        >
+                          <div
+                            className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${state.settings.enableDebt ? "translate-x-6" : "translate-x-0"}`}
+                          />
+                        </button>
+                      </div>
+
+                      {state.settings.enableDebt && (
+                        <div
+                          className={`pt-4 border-t animate-in fade-in slide-in-from-top-2 ${t.border}`}
+                        >
+                          <div className="flex justify-between items-center mb-3">
+                            <span className={`text-sm font-bold ${t.textMain}`}>
+                              Custom Debt Limit
+                            </span>
+                            <button
+                              onClick={() =>
+                                dispatch({
+                                  type: "UPDATE_SETTINGS",
+                                  payload: {
+                                    enableDebtLimit:
+                                      !state.settings.enableDebtLimit,
+                                  },
+                                })
+                              }
+                              className={`w-10 h-5 rounded-full transition-colors relative ${state.settings.enableDebtLimit ? "bg-sky-500" : isDark ? "bg-neutral-700" : "bg-slate-300"}`}
+                            >
+                              <div
+                                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${state.settings.enableDebtLimit ? "translate-x-5" : "translate-x-0"}`}
+                              />
+                            </button>
+                          </div>
+                          {state.settings.enableDebtLimit && (
+                            <div
+                              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${t.input}`}
+                            >
+                              <span className="text-sky-500 font-bold">$</span>
+                              <input
+                                type="number"
+                                value={state.settings.maxDebt}
+                                onChange={(e) =>
+                                  dispatch({
+                                    type: "UPDATE_SETTINGS",
+                                    payload: {
+                                      maxDebt:
+                                        parseInt(e.target.value, 10) || 0,
+                                    },
+                                  })
+                                }
+                                className={`bg-transparent font-black w-full focus:outline-none ${t.textMain}`}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div
+                      className={`border rounded-3xl p-6 transition-colors ${t.card}`}
+                    >
+                      <h3 className={`font-bold mb-1 ${t.textMain}`}>
+                        Unmortgage Penalty
+                      </h3>
+                      <p className={`text-sm mb-4 ${t.textMuted}`}>
+                        Custom interest % when unmortgaging a property.
+                      </p>
+                      <div
+                        className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${t.input}`}
+                      >
+                        <input
+                          type="number"
+                          value={state.settings.unmortgageInterest ?? 10}
+                          onChange={(e) =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: {
+                                unmortgageInterest:
+                                  parseInt(e.target.value, 10) || 0,
+                              },
+                            })
+                          }
+                          className={`bg-transparent font-black w-full focus:outline-none ${t.textMain}`}
+                        />
+                        <span className="text-emerald-500 font-bold">%</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setIsEditingBoard(true)}
+                        className={`border font-bold py-4 rounded-3xl transition-all duration-200 hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center gap-2 ${t.card} ${t.textMain} ${t.borderHover}`}
+                      >
+                        <Edit3 size={24} className="text-sky-500" /> Customize
+                        Board
+                      </button>
+                      <button
+                        onClick={handleExport}
+                        className={`border font-bold py-4 rounded-3xl transition-all duration-200 hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center gap-2 ${t.card} ${t.textMain} ${t.borderHover}`}
+                      >
+                        <Upload size={24} className="text-emerald-500" /> Export
+                        Save Data
+                      </button>
+                    </div>
+
+                    <div
+                      className={`border rounded-3xl p-6 transition-colors ${t.card}`}
+                    >
+                      <h3
+                        className={`font-bold mb-4 flex items-center gap-2 ${t.textMain}`}
+                      >
+                        <Info size={18} className="text-emerald-500" /> About
+                        B.A.B.E.
+                      </h3>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className={`font-bold ${t.textMain}`}>
+                            Version 5.6.0
+                          </p>
+                          <p className={`text-sm ${t.textMuted}`}>
+                            Developed by Yousuf with AI
+                          </p>
+                        </div>
+                        <a
+                          href="https://github.com/ntiqueC0de"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`p-3 rounded-full border transition-all duration-200 hover:scale-[1.05] active:scale-95 ${t.card} ${t.textMain} ${t.borderHover}`}
+                        >
+                          <Github size={24} />
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="bg-rose-500/10 rounded-3xl p-6 border border-rose-500/20">
+                      <h3 className="text-rose-500 font-bold mb-4 flex items-center gap-2">
+                        <AlertOctagon size={18} /> Danger Zone
+                      </h3>
+                      <button
+                        onClick={() => setEndGameConfirm(true)}
+                        className="w-full bg-amber-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all mb-3"
+                      >
+                        End Game & Rank Players
+                      </button>
+                      <button
+                        onClick={() => setResetConfirm(true)}
+                        className="w-full bg-rose-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      >
+                        Reset App
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </main>
+
+              <nav
+                className={`absolute bottom-0 w-full z-20 pb-safe transition-colors duration-300 backdrop-blur-xl border-t px-6 py-4 flex justify-between items-center shrink-0 ${t.nav}`}
+              >
+                {[
+                  { id: "home", icon: Users, label: "Home" },
+                  { id: "properties", icon: Home, label: "Assets" },
+                  { id: "history", icon: HistoryIcon, label: "Ledger" },
+                  { id: "settings", icon: Settings, label: "Settings" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex flex-col items-center gap-1.5 w-16 transition-colors duration-200 ${activeTab === tab.id ? (isDark ? "text-white" : "text-slate-900") : t.textMuted}`}
+                  >
+                    <tab.icon
+                      size={22}
+                      className={
+                        activeTab === tab.id
+                          ? isDark
+                            ? "drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-transform scale-110"
+                            : "transition-transform scale-110"
+                          : "transition-transform scale-100"
+                      }
+                    />
+                    <span className="text-[9px] font-black uppercase tracking-widest">
+                      {tab.label}
+                    </span>
+                  </button>
+                ))}
+              </nav>
+
+              {/* MODALS RENDERED INSIDE THE HARDWARE WRAPPER */}
+              {isEditingBoard && renderBoardEditor()}
+              {tradeWizard && renderTradeWizard()}
+
+              {/* GLOBAL MONOPOLY POPUP OVERLAY */}
+              {monopolyAlert && (
+                <div
+                  className={`absolute inset-0 z-[400] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 fade-in duration-500 ${t.modalOverlay} backdrop-blur-md`}
+                >
+                  <PartyPopper
+                    size={80}
+                    className="text-emerald-500 mb-6 animate-bounce"
+                  />
+                  <div
+                    className={`border-4 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_80px_rgba(16,185,129,0.3)] ${t.modalBg}`}
+                    style={{
+                      borderColor: monopolyAlert.color.startsWith("bg-[")
+                        ? monopolyAlert.color.slice(4, -1)
+                        : undefined,
+                    }}
+                  >
+                    <h2
+                      className={`text-4xl font-black mb-2 uppercase tracking-tighter ${t.textMain}`}
+                    >
+                      Monopoly!
+                    </h2>
+                    <p className={`text-lg font-bold ${t.textMuted}`}>
+                      <span className={t.textMain}>
+                        {monopolyAlert.playerName}
+                      </span>{" "}
+                      has completed the{" "}
+                      <span className={t.textMain}>
+                        {monopolyAlert.groupName}
+                      </span>{" "}
+                      group!
+                    </p>
+                    <p className={`text-xs mt-4 ${t.textFaint}`}>
+                      Houses and Hotels can now be built.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* BANK MODAL */}
+              {bankModal && (
+                <div
+                  className={`absolute inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
+                >
+                  <div
+                    className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
+                  >
+                    <div
+                      className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b shrink-0 ${t.modalHeader}`}
+                    >
+                      <div>
+                        <h3 className={`font-bold leading-tight ${t.textMain}`}>
+                          Central Bank
+                        </h3>
+                        <span
+                          className={`text-xs uppercase font-bold tracking-widest ${t.textMuted}`}
+                        >
+                          Bank Transfer
+                        </span>
+                      </div>
+                      <button
+                        onClick={closeModals}
+                        className={`p-3 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+
+                    <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+                      <div className="mb-4">
+                        <label
+                          className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                        >
+                          Recipient (Push Money To)
+                        </label>
+                        <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+                          {state.players
+                            .filter((p) => !p.isBankrupt)
+                            .map((p) => (
+                              <button
+                                key={p.id}
+                                onClick={() => setTargetId(p.id)}
+                                className={`flex-shrink-0 px-4 py-2 rounded-xl border transition-all duration-200 ${targetId === p.id ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 scale-105" : `${t.input} ${t.textFaint} hover:border-emerald-500/50`}`}
+                              >
+                                {p.name}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+
+                      <div
+                        className={`mb-4 rounded-2xl border py-2 flex flex-col items-center justify-center relative transition-colors ${t.card}`}
+                      >
+                        <div
+                          className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest ${t.textFaint}`}
+                        >
+                          Amount
+                        </div>
+                        <div className="flex items-start justify-center gap-1">
+                          <span
+                            className={`text-xl mt-1.5 font-bold ${t.textMuted}`}
+                          >
+                            $
+                          </span>
+                          <span
+                            className={`text-5xl font-black tracking-tighter truncate max-w-[250px] ${amountStr === "0" ? t.textFaint : "text-emerald-500"}`}
+                          >
+                            {parseInt(amountStr || 0, 10).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 mb-4">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                          <button
+                            key={num}
+                            onClick={() => handleNumpad(num.toString())}
+                            className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
+                          >
+                            {num}
+                          </button>
+                        ))}
+                        <button
+                          onClick={() => handleNumpad("00")}
+                          className={`h-12 rounded-2xl text-lg font-black transition-all ${t.numpad}`}
+                        >
+                          00
+                        </button>
+                        <button
+                          onClick={() => handleNumpad("0")}
+                          className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
+                        >
+                          0
+                        </button>
+                        <button
+                          onClick={() => handleNumpad("DEL")}
+                          className={`h-12 rounded-2xl flex items-center justify-center transition-all ${t.numpadDel}`}
+                        >
+                          <X size={24} strokeWidth={3} />
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          if (!targetId || amountStr === "0") return;
+                          dispatch({ type: "CLEAR_ERROR" });
+                          dispatch({
+                            type: "TRANSACT",
+                            payload: {
+                              from: "BANK",
+                              to: targetId,
+                              amount: amountStr,
+                              type: "B2P",
+                              msgOverride: "Bank transferred Go Cash/Bonus",
+                            },
+                          });
+                        }}
+                        disabled={!targetId || amountStr === "0"}
+                        className={`w-full py-3 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200 ${!targetId || amountStr === "0" ? "opacity-50 cursor-not-allowed " + t.input : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95"}`}
+                      >
+                        <Check size={24} strokeWidth={3} /> Send to Player
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* PROPERTY MODAL */}
+              {activePropId &&
+                (() => {
+                  const propDef = state.board.find(
+                    (p) => p.id === activePropId,
+                  );
+                  const pState = state.propertyState[activePropId] || {
+                    ownerId: null,
+                    houses: 0,
+                    mortgaged: false,
+                  };
+                  const isOwned = !!pState.ownerId;
+                  const owner = isOwned
+                    ? state.players.find((p) => p.id === pState.ownerId)
+                    : null;
+                  const unmortgageCost = Math.ceil(
+                    propDef.mort *
+                      (1 + (state.settings.unmortgageInterest ?? 10) / 100),
+                  );
+
+                  const handlePropAction = () => {
+                    dispatch({ type: "CLEAR_ERROR" });
+
+                    // Pre-Transaction UI Barrier
+                    let cost = 0;
+                    if (propConfirmAction.type === "BUY") cost = propDef.price;
+                    if (propConfirmAction.type === "BUILD")
+                      cost = propDef.build;
+                    if (propConfirmAction.type === "UNMORTGAGE")
+                      cost = unmortgageCost;
+                    if (propConfirmAction.type === "HOSTILE_TAKEOVER")
+                      cost = propDef.price * 2;
+
+                    const activePlayerToCheck =
+                      propConfirmAction.type === "HOSTILE_TAKEOVER"
+                        ? state.players.find(
+                            (p) => p.id === propConfirmAction.playerId,
+                          )
+                        : propConfirmAction.type === "BUY"
+                          ? state.players.find(
+                              (p) => p.id === propConfirmAction.playerId,
+                            )
+                          : owner;
+
+                    if (cost > 0 && activePlayerToCheck.balance < cost) {
+                      showToast(`Insufficient funds! Need $${cost}.`, "error");
+                      setPropConfirmAction(null);
+                      return;
+                    }
+
+                    // Specific Debt Block for Real Estate
+                    if (
+                      (propConfirmAction.type === "BUY" ||
+                        propConfirmAction.type === "BUILD") &&
+                      activePlayerToCheck.debt > 0
+                    ) {
+                      showToast(
+                        "Cannot buy/build while in debt. Repay loan first.",
+                        "error",
+                      );
+                      setPropConfirmAction(null);
+                      return;
+                    }
+
+                    if (propConfirmAction.type === "HOSTILE_TAKEOVER") {
+                      dispatch({
+                        type: "HOSTILE_TAKEOVER",
+                        payload: {
+                          propertyId: activePropId,
+                          buyerId: propConfirmAction.playerId,
+                        },
+                      });
+                    } else {
+                      dispatch({
+                        type: "PROPERTY_ACTION",
+                        payload: {
+                          actionType: propConfirmAction.type,
+                          propertyId: activePropId,
+                          playerId: propConfirmAction.playerId,
+                          amount: propConfirmAction.amount,
+                          targetPlayerId: propConfirmAction.targetId,
+                        },
+                      });
+                    }
+                  };
+
+                  return (
+                    <div
+                      className={`absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out p-4 ${t.modalOverlay}`}
+                    >
+                      <div
+                        className={`w-full max-w-sm rounded-3xl border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 ease-out relative ${t.modalBg}`}
+                      >
+                        {propConfirmAction && (
+                          <div
+                            className={`absolute inset-0 z-[70] backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in text-center bg-opacity-95 ${t.modalBg}`}
+                          >
+                            <h3
+                              className={`text-xl font-black mb-2 ${t.textMain}`}
+                            >
+                              Confirm Action
+                            </h3>
+                            <p className={`mb-6 text-sm ${t.textMuted}`}>
+                              {propConfirmAction.type === "BUY" &&
+                                `Buy for $${propConfirmAction.amount}?`}
+                              {propConfirmAction.type === "BUILD" &&
+                                `Build for $${propConfirmAction.amount}?`}
+                              {propConfirmAction.type === "SELL_BUILD" &&
+                                `Sell for $${propConfirmAction.amount}?`}
+                              {propConfirmAction.type === "MORTGAGE" &&
+                                `Mortgage and receive $${propConfirmAction.amount}?`}
+                              {propConfirmAction.type === "UNMORTGAGE" &&
+                                `Unmortgage for $${propConfirmAction.amount}?`}
+                              {propConfirmAction.type === "TRANSFER" &&
+                                `Transfer ownership to selected player?`}
+                              {propConfirmAction.type === "HOSTILE_TAKEOVER" &&
+                                `Pay $${propConfirmAction.amount} to seize asset?`}
+                            </p>
+                            <div className="flex gap-3 w-full">
+                              <button
+                                onClick={() => {
+                                  setPropConfirmAction(null);
+                                  dispatch({ type: "CLEAR_ERROR" });
+                                }}
+                                className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={handlePropAction}
+                                className="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        <div
+                          className={`${propDef.color.startsWith("bg-[") ? propDef.color : propDef.color.replace("bg-", "bg-")} ${propDef.text || "text-white"} p-6 relative border-b border-black/10 flex items-center gap-3`}
+                        >
+                          <button
+                            onClick={closeModals}
+                            className="absolute top-2 right-2 p-3 z-[60] bg-black/20 hover:bg-black/40 rounded-full transition-colors backdrop-blur-md text-white"
+                          >
+                            <X size={20} />
+                          </button>
+                          {propDef.icon &&
+                            renderDynamicIcon(
+                              propDef.icon,
+                              32,
+                              "opacity-50 shrink-0",
+                            )}
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">
+                              Title Deed
+                            </p>
+                            <h2 className="text-2xl font-black leading-tight">
+                              {propDef.name}
+                            </h2>
+                          </div>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                          {!isOwned ? (
+                            <div className="space-y-4">
+                              <div className="text-center">
+                                <span
+                                  className={`text-sm font-bold block mb-1 ${t.textMuted}`}
+                                >
+                                  Purchase Price
+                                </span>
+                                <span
+                                  className={`text-4xl font-black ${t.textMain}`}
+                                >
+                                  ${propDef.price}
+                                </span>
+                              </div>
+                              <div>
+                                <label
+                                  className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                                >
+                                  Select Buyer
                                 </label>
-                                <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+                                <div className="grid grid-cols-2 gap-2">
                                   {state.players
-                                    .filter(
-                                      (p) => p.id !== owner.id && !p.isBankrupt,
-                                    )
+                                    .filter((p) => !p.isBankrupt)
                                     .map((p) => (
                                       <button
                                         key={p.id}
                                         onClick={() =>
                                           setPropConfirmAction({
-                                            type: "TRANSFER",
-                                            playerId: owner.id,
-                                            targetId: p.id,
+                                            type: "BUY",
+                                            playerId: p.id,
+                                            amount: propDef.price,
                                           })
                                         }
-                                        className={`flex-shrink-0 px-3 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 active:scale-95 border ${t.input} hover:border-sky-500`}
+                                        className={`py-3 rounded-xl border flex flex-col items-center gap-1 transition-all duration-200 active:scale-95 ${t.input} ${t.borderHover}`}
                                       >
-                                        <div
-                                          className={`w-2 h-2 rounded-full ${p.color.bg}`}
-                                        ></div>
                                         <span
-                                          className={`text-xs font-bold ${t.textMain}`}
+                                          className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                        ></span>
+                                        <span
+                                          className={`text-xs font-bold truncate w-full text-center px-1 ${t.textMain}`}
                                         >
                                           {p.name}
                                         </span>
@@ -3139,208 +3144,595 @@ export default function App() {
                                     ))}
                                 </div>
                               </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-            {/* PLAYER TRANSACTION MODAL */}
-            {modalConfig &&
-              activeP &&
-              (() => {
-                return (
-                  <div
-                    className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
-                  >
-                    <div
-                      className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[95vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
-                    >
-                      <div
-                        className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b ${t.modalHeader}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-3 h-3 rounded-full ${activeP.color.bg}`}
-                          ></div>
-                          <div>
-                            <h3
-                              className={`font-bold leading-tight ${t.textMain}`}
-                            >
-                              {activeP.name}
-                            </h3>
-                            <div className="flex gap-2 text-xs font-mono font-medium">
-                              <span className="text-emerald-500">
-                                Bal: ${activeP.balance.toLocaleString()}
-                              </span>
-                              {activeP.debt > 0 && (
-                                <span className="text-rose-500">
-                                  Debt: -${activeP.debt.toLocaleString()}
-                                </span>
-                              )}
                             </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={closeModals}
-                          className={`p-3 z-[60] rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-
-                      <div
-                        className={`flex p-2 gap-2 border-b overflow-x-auto hide-scrollbar ${t.modalHeader}`}
-                      >
-                        <button
-                          onClick={() => {
-                            setTxType("PAY_PLAYER");
-                            dispatch({ type: "CLEAR_ERROR" });
-                          }}
-                          className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_PLAYER" ? "bg-sky-500 text-white shadow-md shadow-sky-500/20" : t.actionTabNormal}`}
-                        >
-                          Pay Player
-                        </button>
-                        <button
-                          onClick={() => {
-                            setTxType("PAY_BANK");
-                            dispatch({ type: "CLEAR_ERROR" });
-                          }}
-                          className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_BANK" ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" : t.actionTabNormal}`}
-                        >
-                          Pay Bank
-                        </button>
-                        <button
-                          onClick={() => {
-                            setTxType("DEBT");
-                            dispatch({ type: "CLEAR_ERROR" });
-                          }}
-                          disabled={!state.settings.enableDebt}
-                          className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "DEBT" ? "bg-rose-500 text-white shadow-md shadow-rose-500/20" : t.actionTabNormal} ${!state.settings.enableDebt ? "opacity-30 cursor-not-allowed hover:bg-transparent" : ""}`}
-                        >
-                          Take Loan
-                        </button>
-                        {activeP.debt > 0 && (
-                          <button
-                            onClick={() => {
-                              setTxType("REPAY");
-                              dispatch({ type: "CLEAR_ERROR" });
-                            }}
-                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "REPAY" ? "bg-purple-500 text-white shadow-md shadow-purple-500/20" : t.actionTabNormal}`}
-                          >
-                            Repay
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="p-6 flex-1 overflow-y-auto hide-scrollbar">
-                        {txType === "PAY_PLAYER" && (
-                          <div className="mb-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <label
-                              className={`text-[10px] font-bold uppercase tracking-widest mb-3 block ${t.textMuted}`}
-                            >
-                              Recipient
-                            </label>
-                            <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar -mx-2 px-2">
-                              {availableTargets.map((p) => (
-                                <button
-                                  key={p.id}
-                                  onClick={() => setTargetId(p.id)}
-                                  className={`flex-shrink-0 px-4 py-2.5 rounded-xl border transition-all duration-200 flex items-center gap-2 ${targetId === p.id ? `border-sky-500 shadow-md ${t.p2pTag} scale-105` : `${t.input} ${t.textFaint} hover:border-sky-500/50`}`}
+                          ) : (
+                            <div className="space-y-5">
+                              <div
+                                className={`flex justify-between items-center p-3 rounded-xl border transition-colors ${t.modalHeader}`}
+                              >
+                                <span
+                                  className={`text-xs font-bold ${t.textMuted}`}
                                 >
+                                  Owner
+                                </span>
+                                <div className="flex items-center gap-2">
                                   <span
-                                    className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                    className={`w-2 h-2 rounded-full ${owner.color.bg}`}
                                   ></span>
                                   <span
-                                    className={`font-semibold text-sm ${targetId === p.id ? t.textMain : ""}`}
+                                    className={`font-bold text-sm ${t.textMain}`}
                                   >
-                                    {p.name}
+                                    {owner.name}
                                   </span>
-                                </button>
-                              ))}
+                                </div>
+                              </div>
+
+                              {pState.mortgaged ? (
+                                <div className="text-center space-y-4">
+                                  <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl">
+                                    <AlertOctagon
+                                      size={24}
+                                      className="text-rose-500 mx-auto mb-2"
+                                    />
+                                    <span className="text-rose-500 font-bold block">
+                                      Property Mortgaged
+                                    </span>
+                                  </div>
+                                  <button
+                                    onClick={() =>
+                                      setPropConfirmAction({
+                                        type: "UNMORTGAGE",
+                                        playerId: owner.id,
+                                        amount: unmortgageCost,
+                                      })
+                                    }
+                                    className="w-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                                  >
+                                    Unmortgage (${unmortgageCost})
+                                  </button>
+
+                                  <div
+                                    className={`pt-4 border-t text-left ${t.border}`}
+                                  >
+                                    <label className="text-[10px] text-rose-500 font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                      <Swords size={12} /> Hostile Takeover (2x
+                                      Price)
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      {state.players
+                                        .filter(
+                                          (p) =>
+                                            p.id !== owner.id && !p.isBankrupt,
+                                        )
+                                        .map((p) => (
+                                          <button
+                                            key={p.id}
+                                            onClick={() =>
+                                              setPropConfirmAction({
+                                                type: "HOSTILE_TAKEOVER",
+                                                playerId: p.id,
+                                                amount: propDef.price * 2,
+                                              })
+                                            }
+                                            className="px-3 py-2 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-95"
+                                          >
+                                            <div className="flex items-center gap-1">
+                                              <span
+                                                className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                              ></span>
+                                              <span
+                                                className={`text-xs font-bold ${isDark ? "text-rose-300" : "text-rose-600"}`}
+                                              >
+                                                {p.name}
+                                              </span>
+                                            </div>
+                                          </button>
+                                        ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="space-y-3">
+                                  {propDef.type === "street" &&
+                                    (() => {
+                                      const groupProps = state.board.filter(
+                                        (b) => b.group === propDef.group,
+                                      );
+                                      const hasMonopoly = groupProps.every(
+                                        (b) =>
+                                          state.propertyState[b.id]?.ownerId ===
+                                          owner.id,
+                                      );
+                                      const anyMortgagedInGroup =
+                                        groupProps.some(
+                                          (b) =>
+                                            state.propertyState[b.id]
+                                              ?.mortgaged,
+                                        );
+                                      const canBuild =
+                                        hasMonopoly && !anyMortgagedInGroup;
+
+                                      return (
+                                        <div
+                                          className={`p-4 rounded-xl border transition-colors ${t.modalHeader}`}
+                                        >
+                                          <div className="flex justify-between items-center mb-4">
+                                            <span
+                                              className={`text-xs font-bold ${t.textMuted}`}
+                                            >
+                                              Development
+                                            </span>
+                                            <div className="flex gap-1">
+                                              {pState.houses === 5 ? (
+                                                <Building
+                                                  size={16}
+                                                  className="text-rose-500"
+                                                  fill="currentColor"
+                                                />
+                                              ) : (
+                                                Array.from({
+                                                  length: pState.houses,
+                                                }).map((_, i) => (
+                                                  <Home
+                                                    key={i}
+                                                    size={16}
+                                                    className="text-emerald-500"
+                                                    fill="currentColor"
+                                                  />
+                                                ))
+                                              )}
+                                              {pState.houses === 0 && (
+                                                <span
+                                                  className={`text-xs font-bold ${t.textFaint}`}
+                                                >
+                                                  Empty Lot
+                                                </span>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <div className="flex gap-2 flex-col sm:flex-row">
+                                            <button
+                                              onClick={() =>
+                                                setPropConfirmAction({
+                                                  type: "BUILD",
+                                                  playerId: owner.id,
+                                                  amount: propDef.build,
+                                                })
+                                              }
+                                              disabled={
+                                                pState.houses >= 5 || !canBuild
+                                              }
+                                              className={`flex-1 disabled:opacity-50 text-emerald-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-emerald-500/50`}
+                                            >
+                                              Build (${propDef.build})
+                                            </button>
+                                            <button
+                                              onClick={() =>
+                                                setPropConfirmAction({
+                                                  type: "SELL_BUILD",
+                                                  playerId: owner.id,
+                                                  amount: propDef.build / 2,
+                                                })
+                                              }
+                                              disabled={pState.houses === 0}
+                                              className={`flex-1 disabled:opacity-50 text-rose-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-rose-500/50`}
+                                            >
+                                              Sell (${propDef.build / 2})
+                                            </button>
+                                          </div>
+                                          {!hasMonopoly ? (
+                                            <p
+                                              className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
+                                            >
+                                              Requires full {propDef.group} set
+                                              to build.
+                                            </p>
+                                          ) : anyMortgagedInGroup ? (
+                                            <p
+                                              className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
+                                            >
+                                              Cannot build while a{" "}
+                                              {propDef.group} property is
+                                              mortgaged.
+                                            </p>
+                                          ) : null}
+                                        </div>
+                                      );
+                                    })()}
+                                  <button
+                                    onClick={() =>
+                                      setPropConfirmAction({
+                                        type: "MORTGAGE",
+                                        playerId: owner.id,
+                                        amount: propDef.mort,
+                                      })
+                                    }
+                                    disabled={pState.houses > 0}
+                                    className={`w-full disabled:opacity-50 text-amber-500 font-bold py-3 rounded-xl transition-all duration-200 active:scale-95 border ${t.input} hover:border-amber-500/50`}
+                                  >
+                                    Mortgage to Bank (+${propDef.mort})
+                                  </button>
+                                </div>
+                              )}
+
+                              {!pState.mortgaged && (
+                                <div className={`pt-4 border-t ${t.border}`}>
+                                  <button
+                                    onClick={() => {
+                                      setTradeWizard({
+                                        step: 1,
+                                        p1Id: owner.id,
+                                        p1Offer: {
+                                          cash: 0,
+                                          props: [activePropId],
+                                        },
+                                        p2Offer: { cash: 0, props: [] },
+                                      });
+                                      setActivePropId(null);
+                                    }}
+                                    className={`w-full py-3 rounded-xl border font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${t.input} hover:border-sky-500 text-sky-500`}
+                                  >
+                                    <ArrowRightLeft size={16} /> Open Trade
+                                    Wizard
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        )}
-
-                        <div
-                          className={`mb-6 rounded-2xl border p-4 flex flex-col items-center justify-center min-h-[100px] relative transition-colors ${t.card}`}
-                        >
-                          <div
-                            className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest ${t.textFaint}`}
-                          >
-                            Amount
-                          </div>
-                          <div className="flex items-start justify-center gap-1">
-                            <span
-                              className={`text-2xl mt-2 font-bold ${t.textMuted}`}
-                            >
-                              $
-                            </span>
-                            <span
-                              className={`text-6xl font-black tracking-tighter truncate max-w-[250px] transition-colors ${amountStr === "0" ? t.textFaint : txType === "PAY_BANK" ? "text-amber-500" : txType === "DEBT" || txType === "REPAY" ? "text-rose-500" : "text-sky-500"}`}
-                            >
-                              {parseInt(amountStr || 0, 10).toLocaleString()}
-                            </span>
-                          </div>
+                          )}
                         </div>
-
-                        <div className="grid grid-cols-3 gap-2 mb-6">
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                            <button
-                              key={num}
-                              onClick={() => handleNumpad(num.toString())}
-                              className={`py-4 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
-                            >
-                              {num}
-                            </button>
-                          ))}
-                          <button
-                            onClick={() => handleNumpad("00")}
-                            className={`py-4 rounded-2xl text-lg font-black transition-all ${t.numpad}`}
-                          >
-                            00
-                          </button>
-                          <button
-                            onClick={() => handleNumpad("0")}
-                            className={`py-4 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
-                          >
-                            0
-                          </button>
-                          <button
-                            onClick={() => handleNumpad("DEL")}
-                            className={`py-4 rounded-2xl flex items-center justify-center transition-all ${t.numpadDel}`}
-                          >
-                            <X size={24} strokeWidth={3} />
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={executeTx}
-                          disabled={
-                            amountStr === "0" ||
-                            (txType === "PAY_PLAYER" && !targetId)
-                          }
-                          className={`w-full py-5 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200
-                        ${amountStr === "0" || (txType === "PAY_PLAYER" && !targetId) ? `opacity-50 cursor-not-allowed ${t.input}` : txType === "PAY_BANK" ? "bg-amber-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-95" : txType === "DEBT" ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-95" : txType === "REPAY" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30 hover:scale-[1.02] active:scale-95" : "bg-sky-500 text-white shadow-lg shadow-sky-500/30 hover:scale-[1.02] active:scale-95"}`}
-                        >
-                          <Check size={24} strokeWidth={3} />{" "}
-                          {txType === "DEBT"
-                            ? "Request Loan"
-                            : txType === "REPAY"
-                              ? "Repay Debt"
-                              : "Confirm"}
-                        </button>
                       </div>
                     </div>
+                  );
+                })()}
+
+              {/* PLAYER TRANSACTION MODAL */}
+              {modalConfig &&
+                activeP &&
+                (() => {
+                  return (
+                    <div
+                      className={`absolute inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
+                    >
+                      <div
+                        className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
+                      >
+                        <div
+                          className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b shrink-0 ${t.modalHeader}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-3 h-3 rounded-full ${activeP.color.bg}`}
+                            ></div>
+                            <div>
+                              <h3
+                                className={`font-bold leading-tight ${t.textMain}`}
+                              >
+                                {activeP.name}
+                              </h3>
+                              <div className="flex gap-2 text-xs font-mono font-medium">
+                                <span className="text-emerald-500">
+                                  Bal: ${activeP.balance.toLocaleString()}
+                                </span>
+                                {activeP.debt > 0 && (
+                                  <span className="text-rose-500">
+                                    Debt: -${activeP.debt.toLocaleString()}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={closeModals}
+                            className={`p-3 z-[60] rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+
+                        <div
+                          className={`flex p-2 gap-2 border-b overflow-x-auto hide-scrollbar shrink-0 ${t.modalHeader}`}
+                        >
+                          <button
+                            onClick={() => {
+                              setTxType("PAY_PLAYER");
+                              dispatch({ type: "CLEAR_ERROR" });
+                            }}
+                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_PLAYER" ? "bg-sky-500 text-white shadow-md shadow-sky-500/20" : t.actionTabNormal}`}
+                          >
+                            Pay Player
+                          </button>
+                          <button
+                            onClick={() => {
+                              setTxType("PAY_BANK");
+                              dispatch({ type: "CLEAR_ERROR" });
+                            }}
+                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_BANK" ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" : t.actionTabNormal}`}
+                          >
+                            Pay Bank
+                          </button>
+                          <button
+                            onClick={() => {
+                              setTxType("DEBT");
+                              dispatch({ type: "CLEAR_ERROR" });
+                            }}
+                            disabled={!state.settings.enableDebt}
+                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "DEBT" ? "bg-rose-500 text-white shadow-md shadow-rose-500/20" : t.actionTabNormal} ${!state.settings.enableDebt ? "opacity-30 cursor-not-allowed hover:bg-transparent" : ""}`}
+                          >
+                            Take Loan
+                          </button>
+                          {activeP.debt > 0 && (
+                            <button
+                              onClick={() => {
+                                setTxType("REPAY");
+                                dispatch({ type: "CLEAR_ERROR" });
+                              }}
+                              className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "REPAY" ? "bg-purple-500 text-white shadow-md shadow-purple-500/20" : t.actionTabNormal}`}
+                            >
+                              Repay
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+                          {txType === "PAY_PLAYER" && (
+                            <div className="mb-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                              <label
+                                className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                              >
+                                Recipient
+                              </label>
+                              <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+                                {availableTargets.map((p) => (
+                                  <button
+                                    key={p.id}
+                                    onClick={() => setTargetId(p.id)}
+                                    className={`flex-shrink-0 px-4 py-2 rounded-xl border transition-all duration-200 flex items-center gap-2 ${targetId === p.id ? `border-sky-500 shadow-md ${t.p2pTag} scale-105` : `${t.input} ${t.textFaint} hover:border-sky-500/50`}`}
+                                  >
+                                    <span
+                                      className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                    ></span>
+                                    <span
+                                      className={`font-semibold text-sm ${targetId === p.id ? t.textMain : ""}`}
+                                    >
+                                      {p.name}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div
+                            className={`mb-4 rounded-2xl border py-2 flex flex-col items-center justify-center relative transition-colors ${t.card}`}
+                          >
+                            <div
+                              className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest ${t.textFaint}`}
+                            >
+                              Amount
+                            </div>
+                            <div className="flex items-start justify-center gap-1">
+                              <span
+                                className={`text-xl mt-1.5 font-bold ${t.textMuted}`}
+                              >
+                                $
+                              </span>
+                              <span
+                                className={`text-5xl font-black tracking-tighter truncate max-w-[250px] transition-colors ${amountStr === "0" ? t.textFaint : txType === "PAY_BANK" ? "text-amber-500" : txType === "DEBT" || txType === "REPAY" ? "text-rose-500" : "text-sky-500"}`}
+                              >
+                                {parseInt(amountStr || 0, 10).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 mb-4">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                              <button
+                                key={num}
+                                onClick={() => handleNumpad(num.toString())}
+                                className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
+                              >
+                                {num}
+                              </button>
+                            ))}
+                            <button
+                              onClick={() => handleNumpad("00")}
+                              className={`h-12 rounded-2xl text-lg font-black transition-all ${t.numpad}`}
+                            >
+                              00
+                            </button>
+                            <button
+                              onClick={() => handleNumpad("0")}
+                              className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
+                            >
+                              0
+                            </button>
+                            <button
+                              onClick={() => handleNumpad("DEL")}
+                              className={`h-12 rounded-2xl flex items-center justify-center transition-all ${t.numpadDel}`}
+                            >
+                              <X size={24} strokeWidth={3} />
+                            </button>
+                          </div>
+
+                          <button
+                            onClick={executeTx}
+                            disabled={
+                              amountStr === "0" ||
+                              (txType === "PAY_PLAYER" && !targetId)
+                            }
+                            className={`w-full py-3 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200
+                              ${amountStr === "0" || (txType === "PAY_PLAYER" && !targetId) ? `opacity-50 cursor-not-allowed ${t.input}` : txType === "PAY_BANK" ? "bg-amber-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-95" : txType === "DEBT" ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-95" : txType === "REPAY" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30 hover:scale-[1.02] active:scale-95" : "bg-sky-500 text-white shadow-lg shadow-sky-500/30 hover:scale-[1.02] active:scale-95"}`}
+                          >
+                            <Check size={24} strokeWidth={3} />{" "}
+                            {txType === "DEBT"
+                              ? "Request Loan"
+                              : txType === "REPAY"
+                                ? "Repay Debt"
+                                : "Confirm"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+              {/* AUTO BANKRUPTCY POPUP */}
+              {state.pendingBankruptcy &&
+                (() => {
+                  const p = state.players.find(
+                    (p) => p.id === state.pendingBankruptcy,
+                  );
+                  return (
+                    <div
+                      className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+                    >
+                      <div
+                        className={`border border-rose-500/50 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 ease-out ${t.modalBg}`}
+                      >
+                        <div className="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mb-4 ring-2 ring-rose-500/20">
+                          <AlertOctagon size={32} />
+                        </div>
+                        <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                          Zero Balance Reached
+                        </h2>
+                        <p className={`text-sm mb-6 ${t.textMuted}`}>
+                          <strong className={t.textMain}>{p.name}</strong> has
+                          exactly $0. Raise funds or declare bankruptcy.
+                        </p>
+                        <div className="flex flex-col gap-3 w-full">
+                          <button
+                            onClick={() =>
+                              dispatch({ type: "DISMISS_BANKRUPTCY" })
+                            }
+                            className={`w-full py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                          >
+                            Resolve Debt Manually
+                          </button>
+                          <button
+                            onClick={() => {
+                              dispatch({
+                                type: "BANKRUPT_PLAYER",
+                                payload: p.id,
+                              });
+                              showToast(`${p.name} is bankrupt`, "error");
+                            }}
+                            className="w-full py-3 bg-rose-500/10 text-rose-500 font-bold rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-all duration-200 active:scale-95"
+                          >
+                            Declare Bankrupt
+                          </button>
+                          <button
+                            onClick={() => {
+                              dispatch({
+                                type: "BANKRUPT_PLAYER",
+                                payload: p.id,
+                              });
+                              dispatch({ type: "END_GAME_RANKING" });
+                            }}
+                            className="w-full py-3 bg-rose-600 text-white font-bold rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                          >
+                            Declare Bankrupt & End Game
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+              {/* END GAME CONFIRM MODAL */}
+              {resetConfirm && (
+                <div
+                  className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+                >
+                  <div
+                    className={`border border-rose-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
+                  >
+                    <div className="text-center mb-6">
+                      <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                        Reset Game?
+                      </h2>
+                      <p className={`text-sm ${t.textMuted}`}>
+                        This will wipe all progress and return to setup.
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setResetConfirm(false)}
+                        className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          dispatch({ type: "RESET_GAME" });
+                          setResetConfirm(false);
+                        }}
+                        className="flex-1 py-3 bg-rose-600 text-white font-black rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                      >
+                        Reset
+                      </button>
+                    </div>
                   </div>
-                );
-              })()}
+                </div>
+              )}
+
+              {endGameConfirm && (
+                <div
+                  className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+                >
+                  <div
+                    className={`border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
+                  >
+                    <div className="text-center mb-6">
+                      <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                        End Game?
+                      </h2>
+                      <p className={`text-sm ${t.textMuted}`}>
+                        Calculate final net worths and crown a winner.
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setEndGameConfirm(false)}
+                        className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          dispatch({ type: "END_GAME_RANKING" });
+                          setEndGameConfirm(false);
+                        }}
+                        className="flex-1 py-3 bg-amber-500 text-white font-black rounded-xl shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                      >
+                        End Game
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* TOAST - Fixed to physical screen viewport */}
+      <div
+        className={`fixed top-10 left-1/2 -translate-x-1/2 z-[1000] transition-all duration-300 pointer-events-none ease-out w-max max-w-[90vw] ${toast ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95"}`}
+      >
+        {toast && (
+          <div
+            className={`px-4 py-3 rounded-2xl font-bold shadow-2xl flex items-center gap-2 text-sm ${toast.type === "error" ? "bg-rose-500 text-white shadow-rose-500/30" : "bg-emerald-500 text-white shadow-emerald-500/30"}`}
+          >
+            {toast.type === "error" ? (
+              <AlertOctagon size={16} className="shrink-0" />
+            ) : (
+              <Check size={16} className="shrink-0" />
+            )}
+            <span className="truncate">{toast.msg}</span>
           </div>
         )}
       </div>
+
       <style
         dangerouslySetInnerHTML={{
           __html: `.hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }`,
