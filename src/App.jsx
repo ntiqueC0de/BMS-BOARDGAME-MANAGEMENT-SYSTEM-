@@ -5,10 +5,8 @@ import {
   History as HistoryIcon,
   Settings,
   ArrowRight,
-  ArrowLeft,
   Plus,
   Trash2,
-  RotateCcw,
   Play,
   Check,
   X,
@@ -19,11 +17,9 @@ import {
   Building,
   Download,
   Upload,
-  FileJson,
   Info,
   Edit3,
   Award,
-  Handshake,
   Swords,
   Sun,
   Moon,
@@ -37,6 +33,9 @@ import {
   Palette,
   PartyPopper,
   ArrowRightLeft,
+  Coins,
+  Handshake,
+  Share2,
 } from "lucide-react";
 
 // ==========================================
@@ -138,6 +137,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#8B4513]",
     price: 60,
     build: 50,
+    hotel: 50,
     mort: 30,
     type: "street",
   },
@@ -148,6 +148,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#8B4513]",
     price: 60,
     build: 50,
+    hotel: 50,
     mort: 30,
     type: "street",
   },
@@ -168,6 +169,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#87CEEB]",
     price: 100,
     build: 50,
+    hotel: 50,
     mort: 50,
     type: "street",
     text: "text-neutral-900",
@@ -179,6 +181,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#87CEEB]",
     price: 100,
     build: 50,
+    hotel: 50,
     mort: 50,
     type: "street",
     text: "text-neutral-900",
@@ -190,6 +193,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#87CEEB]",
     price: 120,
     build: 50,
+    hotel: 50,
     mort: 60,
     type: "street",
     text: "text-neutral-900",
@@ -201,6 +205,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF69B4]",
     price: 140,
     build: 100,
+    hotel: 100,
     mort: 70,
     type: "street",
   },
@@ -222,6 +227,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF69B4]",
     price: 140,
     build: 100,
+    hotel: 100,
     mort: 70,
     type: "street",
   },
@@ -232,6 +238,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF69B4]",
     price: 160,
     build: 100,
+    hotel: 100,
     mort: 80,
     type: "street",
   },
@@ -252,6 +259,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF8C00]",
     price: 180,
     build: 100,
+    hotel: 100,
     mort: 90,
     type: "street",
   },
@@ -262,6 +270,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF8C00]",
     price: 180,
     build: 100,
+    hotel: 100,
     mort: 90,
     type: "street",
   },
@@ -272,6 +281,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF8C00]",
     price: 200,
     build: 100,
+    hotel: 100,
     mort: 100,
     type: "street",
   },
@@ -282,6 +292,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF0000]",
     price: 220,
     build: 150,
+    hotel: 150,
     mort: 110,
     type: "street",
   },
@@ -292,6 +303,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF0000]",
     price: 220,
     build: 150,
+    hotel: 150,
     mort: 110,
     type: "street",
   },
@@ -302,6 +314,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#FF0000]",
     price: 240,
     build: 150,
+    hotel: 150,
     mort: 120,
     type: "street",
   },
@@ -323,6 +336,7 @@ const DEFAULT_PROPERTIES = [
     text: "text-neutral-900",
     price: 260,
     build: 150,
+    hotel: 150,
     mort: 130,
     type: "street",
   },
@@ -334,6 +348,7 @@ const DEFAULT_PROPERTIES = [
     text: "text-neutral-900",
     price: 260,
     build: 150,
+    hotel: 150,
     mort: 130,
     type: "street",
   },
@@ -356,6 +371,7 @@ const DEFAULT_PROPERTIES = [
     text: "text-neutral-900",
     price: 280,
     build: 150,
+    hotel: 150,
     mort: 140,
     type: "street",
   },
@@ -366,6 +382,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#008000]",
     price: 300,
     build: 200,
+    hotel: 200,
     mort: 150,
     type: "street",
   },
@@ -376,6 +393,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#008000]",
     price: 300,
     build: 200,
+    hotel: 200,
     mort: 150,
     type: "street",
   },
@@ -386,6 +404,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#008000]",
     price: 320,
     build: 200,
+    hotel: 200,
     mort: 160,
     type: "street",
   },
@@ -406,6 +425,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#00008B]",
     price: 350,
     build: 200,
+    hotel: 200,
     mort: 175,
     type: "street",
   },
@@ -416,6 +436,7 @@ const DEFAULT_PROPERTIES = [
     color: "bg-[#00008B]",
     price: 400,
     build: 200,
+    hotel: 200,
     mort: 200,
     type: "street",
   },
@@ -584,39 +605,51 @@ const INITIAL_STATE = {
   history: [],
   board: JSON.parse(JSON.stringify(DEFAULT_PROPERTIES)),
   propertyState: {},
+  treasureBucket: 0,
   settings: {
     startingBalance: 1500,
     enableDebt: true,
     enableDebtLimit: true,
     maxDebt: 1000,
     unmortgageInterest: 10,
+    housesBeforeHotel: 4,
+    enableTreasureBucket: true,
     theme: "dark",
   },
   setupError: null,
-  pendingMonopolyAlert: null,
+  pendingBmsAlert: null,
+  pendingJackpotAlert: null,
+  pendingTradeAlert: null,
 };
 
 // ==========================================
-// ENGINE LOGIC: MONOPOLY DETECTION
+// ENGINE LOGIC: BMS DETECTION
 // ==========================================
-const checkMonopoly = (board, propState, propertyId, newOwnerId) => {
+const checkBmsGroup = (board, propState, propertyId, newOwnerId) => {
   const propDef = board.find((p) => p.id === propertyId);
-  if (!propDef || propDef.group === "Railroad" || propDef.group === "Utility")
+  if (
+    !propDef ||
+    !propDef.group ||
+    propDef.group === "Railroad" ||
+    propDef.group === "Utility" ||
+    propDef.group === "Custom"
+  )
     return null;
 
   const groupProps = board.filter((p) => p.group === propDef.group);
+  if (groupProps.length === 0) return null;
 
-  const isNowMonopoly = groupProps.every((p) => {
+  const isNowBmsGroup = groupProps.every((p) => {
     if (p.id === propertyId) return true;
     return propState[p.id]?.ownerId === newOwnerId;
   });
 
-  const wasMonopoly = groupProps.every(
+  const wasBmsGroup = groupProps.every(
     (p) => propState[p.id]?.ownerId === newOwnerId,
   );
 
-  if (isNowMonopoly && !wasMonopoly) {
-    return { group: propDef.group, color: propDef.color };
+  if (isNowBmsGroup && !wasBmsGroup) {
+    return { group: propDef.group, color: propDef.color || "bg-neutral-500" };
   }
   return null;
 };
@@ -708,14 +741,21 @@ function gameReducer(state, action) {
 
     case "TRANSACT": {
       const { from, to, amount, type, msgOverride } = action.payload;
-      const amountNum = parseInt(amount, 10);
+      let amountNum = parseInt(amount, 10);
+
+      if (from === "BUCKET") {
+        amountNum = state.treasureBucket || 0;
+      }
+
       if (isNaN(amountNum) || amountNum <= 0) return state;
 
       let newPlayers = [...state.players];
       let triggeredBankruptcy = null;
       let historyMsg = msgOverride;
+      let newTreasureBucket = state.treasureBucket || 0;
+      let pendingJackpotAlert = null;
 
-      if (from !== "BANK") {
+      if (from !== "BANK" && from !== "BUCKET") {
         const senderIdx = newPlayers.findIndex((p) => p.id === from);
         if (senderIdx === -1) return state;
 
@@ -727,6 +767,8 @@ function gameReducer(state, action) {
         if (!historyMsg) {
           if (to === "BANK")
             historyMsg = `${newPlayers[senderIdx].name} paid the Bank`;
+          else if (to === "BUCKET")
+            historyMsg = `${newPlayers[senderIdx].name} paid to Treasure Bucket`;
           else {
             const receiver = newPlayers.find((p) => p.id === to);
             historyMsg = `${newPlayers[senderIdx].name} paid ${receiver?.name}`;
@@ -734,7 +776,17 @@ function gameReducer(state, action) {
         }
       }
 
-      if (to !== "BANK") {
+      if (to === "BUCKET") {
+        newTreasureBucket += amountNum;
+      } else if (from === "BUCKET") {
+        newTreasureBucket = 0;
+        const receiver = newPlayers.find((p) => p.id === to);
+        if (!historyMsg)
+          historyMsg = `${receiver?.name} claimed Treasure Bucket`;
+        pendingJackpotAlert = { playerName: receiver?.name, amount: amountNum };
+      }
+
+      if (to !== "BANK" && to !== "BUCKET") {
         const receiverIdx = newPlayers.findIndex((p) => p.id === to);
         if (receiverIdx > -1 && !newPlayers[receiverIdx].isBankrupt) {
           newPlayers[receiverIdx].balance += amountNum;
@@ -748,8 +800,10 @@ function gameReducer(state, action) {
       return {
         ...state,
         players: newPlayers,
+        treasureBucket: newTreasureBucket,
         error: null,
         pendingBankruptcy: triggeredBankruptcy,
+        pendingJackpotAlert: pendingJackpotAlert || state.pendingJackpotAlert,
         history: [
           {
             id: generateId(),
@@ -844,7 +898,7 @@ function gameReducer(state, action) {
       newPlayers[buyerIdx].balance -= cost;
       newPlayers[ownerIdx].balance += refund;
 
-      const newMonopoly = checkMonopoly(
+      const newBmsGroup = checkBmsGroup(
         state.board,
         state.propertyState,
         propertyId,
@@ -868,11 +922,11 @@ function gameReducer(state, action) {
         propertyState: newPropState,
         error: null,
         pendingBankruptcy: triggeredBankruptcy,
-        pendingMonopolyAlert: newMonopoly
+        pendingBmsAlert: newBmsGroup
           ? {
               playerName: buyerName,
-              groupName: newMonopoly.group,
-              color: newMonopoly.color,
+              groupName: newBmsGroup.group,
+              color: newBmsGroup.color,
             }
           : null,
         history: [
@@ -897,6 +951,7 @@ function gameReducer(state, action) {
 
       const p1Idx = newPlayers.findIndex((p) => p.id === p1Id);
       const p2Idx = newPlayers.findIndex((p) => p.id === p2Id);
+      if (p1Idx === -1 || p2Idx === -1) return state;
 
       const p1Name = newPlayers[p1Idx].name;
       const p2Name = newPlayers[p2Idx].name;
@@ -906,29 +961,35 @@ function gameReducer(state, action) {
       newPlayers[p2Idx].balance =
         newPlayers[p2Idx].balance - p2Offer.cash + p1Offer.cash;
 
-      let p1GotMonopoly = null;
-      let p2GotMonopoly = null;
+      let p1GotBms = null;
+      let p2GotBms = null;
 
-      p1Offer.props.forEach((pid) => {
-        const m = checkMonopoly(state.board, newPropState, pid, p2Id);
-        if (m)
-          p2GotMonopoly = {
-            playerName: p2Name,
-            groupName: m.group,
-            color: m.color,
-          };
-        newPropState[pid] = { ...newPropState[pid], ownerId: p2Id };
+      (p1Offer.props || []).forEach((pid) => {
+        const propExists = state.board.find((b) => b.id === pid);
+        if (propExists) {
+          const m = checkBmsGroup(state.board, newPropState, pid, p2Id);
+          if (m)
+            p2GotBms = {
+              playerName: p2Name,
+              groupName: m.group,
+              color: m.color,
+            };
+          newPropState[pid] = { ...newPropState[pid], ownerId: p2Id };
+        }
       });
 
-      p2Offer.props.forEach((pid) => {
-        const m = checkMonopoly(state.board, newPropState, pid, p1Id);
-        if (m)
-          p1GotMonopoly = {
-            playerName: p1Name,
-            groupName: m.group,
-            color: m.color,
-          };
-        newPropState[pid] = { ...newPropState[pid], ownerId: p1Id };
+      (p2Offer.props || []).forEach((pid) => {
+        const propExists = state.board.find((b) => b.id === pid);
+        if (propExists) {
+          const m = checkBmsGroup(state.board, newPropState, pid, p1Id);
+          if (m)
+            p1GotBms = {
+              playerName: p1Name,
+              groupName: m.group,
+              color: m.color,
+            };
+          newPropState[pid] = { ...newPropState[pid], ownerId: p1Id };
+        }
       });
 
       let triggeredBankruptcy = null;
@@ -941,7 +1002,8 @@ function gameReducer(state, action) {
         propertyState: newPropState,
         error: null,
         pendingBankruptcy: triggeredBankruptcy,
-        pendingMonopolyAlert: p1GotMonopoly || p2GotMonopoly || null,
+        pendingBmsAlert: p1GotBms || p2GotBms || null,
+        pendingTradeAlert: { p1Name, p2Name },
         history: [
           {
             id: generateId(),
@@ -964,7 +1026,7 @@ function gameReducer(state, action) {
       let newPlayers = [...state.players];
       let newPropState = { ...state.propertyState };
       let historyMsg = "";
-      let newlyFormedMonopoly = null;
+      let newlyFormedBms = null;
 
       const pIdx = newPlayers.findIndex((p) => p.id === playerId);
       if (pIdx === -1) return state;
@@ -977,7 +1039,7 @@ function gameReducer(state, action) {
       };
 
       if (actionType === "TRANSFER") {
-        newlyFormedMonopoly = checkMonopoly(
+        newlyFormedBms = checkBmsGroup(
           state.board,
           state.propertyState,
           propertyId,
@@ -994,7 +1056,7 @@ function gameReducer(state, action) {
         }
 
         if (actionType === "BUY") {
-          newlyFormedMonopoly = checkMonopoly(
+          newlyFormedBms = checkBmsGroup(
             state.board,
             state.propertyState,
             propertyId,
@@ -1005,17 +1067,21 @@ function gameReducer(state, action) {
             houses: 0,
             mortgaged: false,
           };
-          historyMsg = `${pName} bought ${propDef.name}`;
+          historyMsg =
+            amount === propDef.price
+              ? `${pName} bought ${propDef.name}`
+              : `${pName} bought ${propDef.name} for custom price $${amount}`;
         } else if (actionType === "BUILD") {
           newPropState[propertyId] = { ...pState, houses: pState.houses + 1 };
           historyMsg =
-            pState.houses === 4
+            newPropState[propertyId].houses >
+            (state.settings.housesBeforeHotel ?? 4)
               ? `${pName} built a Hotel on ${propDef.name}`
               : `${pName} built a House on ${propDef.name}`;
         } else if (actionType === "SELL_BUILD") {
           newPropState[propertyId] = { ...pState, houses: pState.houses - 1 };
           historyMsg =
-            pState.houses === 5
+            pState.houses >= (state.settings.housesBeforeHotel ?? 4)
               ? `${pName} sold a Hotel on ${propDef.name}`
               : `${pName} sold a House on ${propDef.name}`;
         } else if (actionType === "MORTGAGE") {
@@ -1028,9 +1094,7 @@ function gameReducer(state, action) {
       }
 
       let triggeredBankruptcy = null;
-      if (newPlayers[pIdx].balance === 0) {
-        triggeredBankruptcy = playerId;
-      }
+      if (newPlayers[pIdx].balance === 0) triggeredBankruptcy = playerId;
 
       return {
         ...state,
@@ -1038,14 +1102,14 @@ function gameReducer(state, action) {
         propertyState: newPropState,
         error: null,
         pendingBankruptcy: triggeredBankruptcy,
-        pendingMonopolyAlert: newlyFormedMonopoly
+        pendingBmsAlert: newlyFormedBms
           ? {
               playerName:
                 actionType === "TRANSFER"
                   ? state.players.find((p) => p.id === targetPlayerId).name
                   : pName,
-              groupName: newlyFormedMonopoly.group,
-              color: newlyFormedMonopoly.color,
+              groupName: newlyFormedBms.group,
+              color: newlyFormedBms.color,
             }
           : null,
         history: [
@@ -1071,8 +1135,13 @@ function gameReducer(state, action) {
       };
     }
 
-    case "CLEAR_MONOPOLY_ALERT":
-      return { ...state, pendingMonopolyAlert: null };
+    case "CLEAR_ALERTS":
+      return {
+        ...state,
+        pendingBmsAlert: null,
+        pendingJackpotAlert: null,
+        pendingTradeAlert: null,
+      };
 
     case "BANKRUPT_PLAYER": {
       const pId = action.payload;
@@ -1167,6 +1236,10 @@ export default function App() {
   const [propConfirmAction, setPropConfirmAction] = useState(null);
   const [isEditingBoard, setIsEditingBoard] = useState(false);
   const [boardResetConfirm, setBoardResetConfirm] = useState(false);
+  const [showAddPropType, setShowAddPropType] = useState(false);
+
+  const [customBuyPrice, setCustomBuyPrice] = useState("0");
+  const [isEditingBuyPrice, setIsEditingBuyPrice] = useState(false);
 
   // Trade Wizard State
   const [tradeWizard, setTradeWizard] = useState(null);
@@ -1175,7 +1248,12 @@ export default function App() {
   const [resetConfirm, setResetConfirm] = useState(false);
 
   const [bankModal, setBankModal] = useState(false);
-  const [monopolyAlert, setMonopolyAlert] = useState(null);
+  const [bucketModal, setBucketModal] = useState(false);
+
+  // Alerts
+  const [bmsAlert, setBmsAlert] = useState(null);
+  const [jackpotAlert, setJackpotAlert] = useState(null);
+  const [tradeAlert, setTradeAlert] = useState(null);
 
   const prevHistoryLength = useRef(state.history.length);
   const [toast, setToast] = useState(null);
@@ -1186,10 +1264,14 @@ export default function App() {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("babe_state");
+    const saved = localStorage.getItem("bms_state");
     if (saved) {
       try {
-        dispatch({ type: "LOAD_STATE", payload: JSON.parse(saved) });
+        const parsed = JSON.parse(saved);
+        dispatch({ type: "LOAD_STATE", payload: parsed });
+        if (parsed.phase === "playing") {
+          setActiveTab("home");
+        }
       } catch (e) {
         console.error("Failed to load save", e);
       }
@@ -1197,20 +1279,33 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("babe_state", JSON.stringify(state));
+    localStorage.setItem("bms_state", JSON.stringify(state));
   }, [state]);
 
-  // Ensure app always drops onto the home screen when entering game phase
+  // Make sure we default to the Home tab on state changes like starting a game
   useEffect(() => {
     if (state.phase === "playing") {
       setActiveTab("home");
     }
   }, [state.phase]);
 
+  // Set the default buy price when Property Modal is opened
+  useEffect(() => {
+    if (activePropId) {
+      const p = state.board.find((b) => b.id === activePropId);
+      if (p) {
+        setCustomBuyPrice(p.price.toString());
+        setIsEditingBuyPrice(false);
+      }
+    }
+  }, [activePropId, state.board]);
+
   // UI Side Effect: Listen for History Growth (Transaction Success)
   useEffect(() => {
     if (state.history.length > prevHistoryLength.current) {
       const lastTx = state.history[0];
+      // Do not duplicate generic transaction toasts if we already showed a specific confirmation
+      // However, history is a great single source of truth for toasts.
       showToast(lastTx.message || "Transaction Complete", "success");
 
       setModalConfig(null);
@@ -1218,6 +1313,7 @@ export default function App() {
       setPropConfirmAction(null);
       setTradeWizard(null);
       setBankModal(false);
+      setBucketModal(false);
       setTxType("PAY_PLAYER");
       setTargetId("");
       setAmountStr("0");
@@ -1225,14 +1321,46 @@ export default function App() {
     prevHistoryLength.current = state.history.length;
   }, [state.history.length]);
 
-  // UI Side Effect: Handle Monopoly Alert Timers
+  // UI Side Effect: Handle Full Screen Alerts
   useEffect(() => {
-    if (state.pendingMonopolyAlert) {
-      setMonopolyAlert(state.pendingMonopolyAlert);
-      dispatch({ type: "CLEAR_MONOPOLY_ALERT" });
-      setTimeout(() => setMonopolyAlert(null), 5000);
+    if (
+      state.pendingBmsAlert ||
+      state.pendingJackpotAlert ||
+      state.pendingTradeAlert
+    ) {
+      if (state.pendingBmsAlert) setBmsAlert(state.pendingBmsAlert);
+      if (state.pendingJackpotAlert) setJackpotAlert(state.pendingJackpotAlert);
+      if (state.pendingTradeAlert) setTradeAlert(state.pendingTradeAlert);
+
+      dispatch({ type: "CLEAR_ALERTS" });
+
+      // Auto-dismiss after 5s if user hasn't clicked/tapped
+      const timer = setTimeout(() => {
+        setBmsAlert(null);
+        setJackpotAlert(null);
+        setTradeAlert(null);
+      }, 5000);
+      return () => clearTimeout(timer);
     }
-  }, [state.pendingMonopolyAlert]);
+  }, [
+    state.pendingBmsAlert,
+    state.pendingJackpotAlert,
+    state.pendingTradeAlert,
+  ]);
+
+  // Instant dismissal of celebration alerts via keyboard
+  useEffect(() => {
+    const handleKeyDown = () => {
+      if (bmsAlert) setBmsAlert(null);
+      if (jackpotAlert) setJackpotAlert(null);
+      if (tradeAlert) setTradeAlert(null);
+    };
+
+    if (bmsAlert || jackpotAlert || tradeAlert) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [bmsAlert, jackpotAlert, tradeAlert]);
 
   const triggerHaptic = () => {
     if (typeof window !== "undefined" && window.navigator?.vibrate)
@@ -1245,6 +1373,7 @@ export default function App() {
     setPropConfirmAction(null);
     setTradeWizard(null);
     setBankModal(false);
+    setBucketModal(false);
     setTxType("PAY_PLAYER");
     setTargetId("");
     setAmountStr("0");
@@ -1266,7 +1395,11 @@ export default function App() {
     const amountNum = parseInt(amountStr, 10);
     const activePlayerId = activeP.id;
 
-    if (txType === "PAY_PLAYER" || txType === "PAY_BANK") {
+    if (
+      txType === "PAY_PLAYER" ||
+      txType === "PAY_BANK" ||
+      txType === "PAY_BUCKET"
+    ) {
       if (activeP.balance < amountNum) {
         showToast("Insufficient funds! Take a loan first.", "error");
         return;
@@ -1325,6 +1458,10 @@ export default function App() {
       } else if (txType === "PAY_BANK") {
         from = activePlayerId;
         type = "P2B";
+      } else if (txType === "PAY_BUCKET") {
+        from = activePlayerId;
+        to = "BUCKET";
+        type = "P2B";
       }
       action = {
         type: "TRANSACT",
@@ -1342,7 +1479,7 @@ export default function App() {
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute(
       "download",
-      `babe_save_${new Date().getTime()}.json`,
+      `bms_save_${new Date().getTime()}.json`,
     );
     dlAnchorElem.click();
     showToast("Game state exported!");
@@ -1374,12 +1511,59 @@ export default function App() {
     dispatch({ type: "UPDATE_BOARD", payload: newBoard });
   };
 
+  const removeBoardItem = (idx) => {
+    const newBoard = [...state.board];
+    newBoard.splice(idx, 1);
+    dispatch({ type: "UPDATE_BOARD", payload: newBoard });
+    showToast("Property deleted", "error");
+  };
+
+  const addBoardItem = (type) => {
+    const newBoard = [
+      ...state.board,
+      {
+        id: generateId(),
+        name: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+        group:
+          type === "street"
+            ? "Custom"
+            : type === "railroad"
+              ? "Railroad"
+              : "Utility",
+        color:
+          type === "street"
+            ? "bg-[#888888]"
+            : type === "railroad"
+              ? "bg-neutral-900"
+              : "bg-neutral-300",
+        price: type === "street" ? 100 : type === "railroad" ? 200 : 150,
+        build: type === "street" ? 50 : undefined,
+        hotel: type === "street" ? 50 : undefined,
+        mort: 50,
+        type: type,
+        icon:
+          type === "railroad"
+            ? "Train"
+            : type === "utility"
+              ? "Zap"
+              : undefined,
+        text: type === "utility" ? "text-neutral-900" : undefined,
+      },
+    ];
+    dispatch({ type: "UPDATE_BOARD", payload: newBoard });
+    showToast("New property added");
+  };
+
   // ==========================================
   // VIEW: TRADE WIZARD
   // ==========================================
   const renderTradeWizard = () => {
     if (!tradeWizard) return null;
     const p1 = state.players.find((p) => p.id === tradeWizard.p1Id);
+    if (!p1) {
+      closeModals();
+      return null;
+    }
 
     // Step 1: Select Partner
     if (tradeWizard.step === 1) {
@@ -1443,6 +1627,10 @@ export default function App() {
 
     // Step 2: Build Trade
     const p2 = state.players.find((p) => p.id === tradeWizard.p2Id);
+    if (!p2) {
+      closeModals();
+      return null;
+    }
 
     const toggleTradeProp = (propId, isP1) => {
       if (doesGroupHaveHouses(state.board, state.propertyState, propId)) {
@@ -1453,14 +1641,15 @@ export default function App() {
         return;
       }
       setTradeWizard((prev) => {
-        const list = isP1 ? prev.p1Offer.props : prev.p2Offer.props;
+        const offerObj = isP1 ? prev.p1Offer : prev.p2Offer;
+        const list = offerObj?.props || [];
         const newList = list.includes(propId)
           ? list.filter((id) => id !== propId)
           : [...list, propId];
         return {
           ...prev,
           [isP1 ? "p1Offer" : "p2Offer"]: {
-            ...prev[isP1 ? "p1Offer" : "p2Offer"],
+            ...offerObj,
             props: newList,
           },
         };
@@ -1469,8 +1658,8 @@ export default function App() {
 
     const handleExecuteTrade = () => {
       dispatch({ type: "CLEAR_ERROR" });
-      const p1CashNum = parseInt(tradeWizard.p1Offer.cash, 10) || 0;
-      const p2CashNum = parseInt(tradeWizard.p2Offer.cash, 10) || 0;
+      const p1CashNum = parseInt(tradeWizard.p1Offer?.cash, 10) || 0;
+      const p2CashNum = parseInt(tradeWizard.p2Offer?.cash, 10) || 0;
 
       if (p1.balance < p1CashNum) {
         showToast(`${p1.name} has insufficient funds for this trade!`, "error");
@@ -1481,13 +1670,27 @@ export default function App() {
         return;
       }
 
+      // Check if BOTH sides are offering empty
+      const p1HasOffer =
+        p1CashNum > 0 || (tradeWizard.p1Offer?.props?.length || 0) > 0;
+      const p2HasOffer =
+        p2CashNum > 0 || (tradeWizard.p2Offer?.props?.length || 0) > 0;
+
+      if (!p1HasOffer || !p2HasOffer) {
+        showToast(
+          "Both players must offer property or cash to complete a trade.",
+          "error",
+        );
+        return;
+      }
+
       dispatch({
         type: "EXECUTE_TRADE",
         payload: {
           p1Id: p1.id,
           p2Id: p2.id,
-          p1Offer: { cash: p1CashNum, props: tradeWizard.p1Offer.props },
-          p2Offer: { cash: p2CashNum, props: tradeWizard.p2Offer.props },
+          p1Offer: { cash: p1CashNum, props: tradeWizard.p1Offer?.props || [] },
+          p2Offer: { cash: p2CashNum, props: tradeWizard.p2Offer?.props || [] },
         },
       });
     };
@@ -1523,7 +1726,7 @@ export default function App() {
               <span
                 className={`text-xl font-black ${isP1 ? "text-sky-500" : "text-emerald-500"}`}
               >
-                ${offer.cash || 0}
+                ${offer?.cash || 0}
               </span>
             </div>
             <input
@@ -1531,7 +1734,7 @@ export default function App() {
               min="0"
               max={player.balance}
               step="10"
-              value={offer.cash || 0}
+              value={offer?.cash || 0}
               onChange={(e) =>
                 setTradeWizard((prev) => ({
                   ...prev,
@@ -1552,7 +1755,7 @@ export default function App() {
               </p>
             )}
             {ownedProps.map((p) => {
-              const isSelected = offer.props.includes(p.id);
+              const isSelected = (offer?.props || []).includes(p.id);
               const groupHasHouses = doesGroupHaveHouses(
                 state.board,
                 state.propertyState,
@@ -1683,10 +1886,62 @@ export default function App() {
                   onClick={() => {
                     dispatch({ type: "RESET_BOARD_DEFAULTS" });
                     setBoardResetConfirm(false);
+                    showToast("Board reset to defaults");
                   }}
                   className="flex-1 py-3 bg-rose-600 text-white font-black rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
                   Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAddPropType && (
+          <div
+            className={`absolute inset-0 z-[400] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+          >
+            <div
+              className={`border border-emerald-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
+            >
+              <h3
+                className={`text-xl font-black text-center mb-4 ${t.textMain}`}
+              >
+                Select Asset Type
+              </h3>
+              <div className="grid gap-3">
+                <button
+                  onClick={() => {
+                    addBoardItem("street");
+                    setShowAddPropType(false);
+                  }}
+                  className={`p-4 rounded-xl border font-bold transition-colors ${t.input} hover:border-emerald-500 text-left`}
+                >
+                  🏡 Street (Buildable)
+                </button>
+                <button
+                  onClick={() => {
+                    addBoardItem("railroad");
+                    setShowAddPropType(false);
+                  }}
+                  className={`p-4 rounded-xl border font-bold transition-colors ${t.input} hover:border-emerald-500 text-left`}
+                >
+                  🚆 Railroad
+                </button>
+                <button
+                  onClick={() => {
+                    addBoardItem("utility");
+                    setShowAddPropType(false);
+                  }}
+                  className={`p-4 rounded-xl border font-bold transition-colors ${t.input} hover:border-emerald-500 text-left`}
+                >
+                  ⚡ Utility
+                </button>
+                <button
+                  onClick={() => setShowAddPropType(false)}
+                  className={`p-4 rounded-xl border font-bold mt-2 transition-colors ${t.card} text-rose-500`}
+                >
+                  Cancel
                 </button>
               </div>
             </div>
@@ -1708,7 +1963,7 @@ export default function App() {
             Done
           </button>
         </header>
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar pb-24">
           <p className={`text-xs text-center mb-4 ${t.textMuted}`}>
             Changes save automatically and persist across new games.
           </p>
@@ -1719,126 +1974,175 @@ export default function App() {
             Reset to Defaults
           </button>
 
-          {state.board.map((prop, idx) => (
-            <div
-              key={prop.id + prop.name}
-              className={`border rounded-2xl p-4 flex flex-col gap-3 ${t.card}`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded shrink-0 shadow-sm border border-black/10 flex items-center justify-center relative overflow-hidden`}
-                  style={
-                    prop.color.startsWith("bg-[")
-                      ? { backgroundColor: prop.color.slice(4, -1) }
-                      : undefined
-                  }
-                >
-                  {!prop.color.startsWith("bg-[") && (
-                    <div className={`absolute inset-0 ${prop.color}`} />
-                  )}
-                  {prop.icon &&
-                    renderDynamicIcon(
-                      prop.icon,
-                      16,
-                      "text-white relative z-10",
-                    )}
-                </div>
-                <input
-                  type="text"
-                  value={prop.name}
-                  onChange={(e) =>
-                    updateBoardItem(idx, { name: e.target.value })
-                  }
-                  className={`flex-1 rounded-lg px-3 py-2 font-bold focus:outline-none border transition-colors ${t.input}`}
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="flex-1">
-                  <span
-                    className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
+          {state.board.map((prop, idx) => {
+            const hexColor = prop.color.startsWith("bg-[")
+              ? prop.color.slice(4, -1)
+              : "#888888";
+            return (
+              <div
+                key={prop.id} // Fixes the typing focus bug
+                className={`border rounded-2xl p-4 flex flex-col gap-3 ${t.card}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-8 h-8 rounded shrink-0 shadow-sm border border-black/10 flex items-center justify-center relative overflow-hidden`}
+                    style={{ backgroundColor: hexColor }}
                   >
-                    Price
-                  </span>
+                    <input
+                      type="color"
+                      value={hexColor}
+                      onChange={(e) =>
+                        updateBoardItem(idx, {
+                          color: `bg-[${e.target.value}]`,
+                        })
+                      }
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                    {prop.icon &&
+                      renderDynamicIcon(
+                        prop.icon,
+                        16,
+                        "text-white relative z-10 pointer-events-none",
+                      )}
+                  </div>
                   <input
-                    type="number"
-                    value={prop.price}
+                    type="text"
+                    value={prop.name}
                     onChange={(e) =>
-                      updateBoardItem(idx, {
-                        price: parseInt(e.target.value) || 0,
-                      })
+                      updateBoardItem(idx, { name: e.target.value })
                     }
-                    className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
+                    className={`flex-1 rounded-lg px-3 py-2 font-bold focus:outline-none border transition-colors ${t.input}`}
                   />
+                  <button
+                    onClick={() => removeBoardItem(idx)}
+                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
-                {prop.type === "street" && (
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <span
                       className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
                     >
-                      Build Cost
+                      Price
                     </span>
                     <input
                       type="number"
-                      value={prop.build}
+                      value={prop.price === 0 ? "" : prop.price}
                       onChange={(e) =>
                         updateBoardItem(idx, {
-                          build: parseInt(e.target.value) || 0,
+                          price: parseInt(e.target.value) || 0,
                         })
                       }
                       className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
                     />
                   </div>
-                )}
-                {prop.type !== "street" && (
+                  {prop.type === "street" && (
+                    <>
+                      <div className="flex-1">
+                        <span
+                          className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
+                        >
+                          House Cost
+                        </span>
+                        <input
+                          type="number"
+                          value={prop.build === 0 ? "" : prop.build}
+                          onChange={(e) =>
+                            updateBoardItem(idx, {
+                              build: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <span
+                          className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
+                        >
+                          Hotel Cost
+                        </span>
+                        <input
+                          type="number"
+                          value={
+                            (prop.hotel ?? prop.build) === 0
+                              ? ""
+                              : (prop.hotel ?? prop.build)
+                          }
+                          onChange={(e) =>
+                            updateBoardItem(idx, {
+                              hotel: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {prop.type !== "street" && (
+                    <div className="flex-1">
+                      <span
+                        className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
+                      >
+                        Type
+                      </span>
+                      <select
+                        value={prop.type}
+                        onChange={(e) =>
+                          updateBoardItem(idx, {
+                            type: e.target.value,
+                            icon:
+                              e.target.value === "railroad"
+                                ? "Train"
+                                : e.target.value === "utility"
+                                  ? "Zap"
+                                  : undefined,
+                          })
+                        }
+                        className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
+                      >
+                        <option value="street">Street</option>
+                        <option value="railroad">Railroad</option>
+                        <option value="utility">Utility</option>
+                      </select>
+                    </div>
+                  )}
                   <div className="flex-1">
                     <span
                       className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
                     >
-                      Icon
+                      Mortgage
                     </span>
-                    <select
-                      value={prop.icon || "Train"}
+                    <input
+                      type="number"
+                      value={prop.mort === 0 ? "" : prop.mort}
                       onChange={(e) =>
-                        updateBoardItem(idx, { icon: e.target.value })
+                        updateBoardItem(idx, {
+                          mort: parseInt(e.target.value) || 0,
+                        })
                       }
                       className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
-                    >
-                      <option value="Train">Railway</option>
-                      <option value="Plane">Airway</option>
-                      <option value="Car">Roadway</option>
-                      <option value="Ship">Seaway</option>
-                      <option value="Zap">Energy</option>
-                      <option value="Droplet">Water</option>
-                    </select>
+                    />
                   </div>
-                )}
-                <div className="flex-1">
-                  <span
-                    className={`text-[10px] uppercase font-bold block mb-1 ${t.textMuted}`}
-                  >
-                    Mortgage
-                  </span>
-                  <input
-                    type="number"
-                    value={prop.mort}
-                    onChange={(e) =>
-                      updateBoardItem(idx, {
-                        mort: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className={`w-full rounded-lg px-3 py-1.5 focus:outline-none border transition-colors ${t.input}`}
-                  />
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+
+          <button
+            onClick={() => setShowAddPropType(true)}
+            className={`w-full py-4 border-2 border-dashed rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-95 ${t.textMuted} ${t.borderHover}`}
+          >
+            <Plus size={20} /> Add New Property
+          </button>
         </div>
       </div>
     );
   };
 
   const renderSetup = () => (
-    <div className="flex-1 flex flex-col p-6 overflow-y-auto hide-scrollbar relative">
+    <div className="flex-1 flex flex-col h-full relative">
       <div className="absolute top-6 right-6 z-10">
         <button
           onClick={() =>
@@ -1853,19 +2157,19 @@ export default function App() {
         </button>
       </div>
 
-      <div className="w-full max-w-md mx-auto space-y-8 animate-in fade-in duration-500 ease-out mt-8 pb-10">
-        <div className="text-center space-y-2">
-          <div className="bg-emerald-500/10 text-emerald-500 w-20 h-20 rounded-2xl mx-auto flex items-center justify-center mb-4 ring-1 ring-emerald-500/30 transition-transform hover:scale-105 duration-300">
-            <Landmark size={40} />
-          </div>
-          <h1 className={`text-4xl font-black tracking-tight ${t.textMain}`}>
-            B.A.B.E.
-          </h1>
-          <p className={`font-medium text-sm sm:text-base ${t.textMuted}`}>
-            Board game Asset management & Banking Engine
-          </p>
+      <div className="shrink-0 pt-12 pb-6 px-6 text-center animate-in fade-in duration-500 ease-out">
+        <div className="bg-emerald-500/10 text-emerald-500 w-20 h-20 rounded-2xl mx-auto flex items-center justify-center mb-4 ring-1 ring-emerald-500/30 transition-transform hover:scale-105 duration-300">
+          <Landmark size={40} />
         </div>
+        <h1 className={`text-4xl font-black tracking-tight ${t.textMain}`}>
+          BMS
+        </h1>
+        <p className={`font-medium text-sm sm:text-base ${t.textMuted}`}>
+          Boardgame Management System
+        </p>
+      </div>
 
+      <div className="flex-1 overflow-y-auto px-6 pb-6 hide-scrollbar space-y-6">
         <div
           className={`border rounded-3xl p-6 shadow-xl space-y-6 transition-colors duration-300 ${t.card}`}
         >
@@ -1913,7 +2217,7 @@ export default function App() {
               )}
             </div>
 
-            <div className="space-y-2 mb-6 min-h-[100px] max-h-[30vh] overflow-y-auto pr-1 hide-scrollbar">
+            <div className="space-y-2 mb-6 min-h-[100px]">
               {state.players.length === 0 ? (
                 <div
                   className={`h-full flex items-center justify-center text-sm italic py-4 ${t.textFaint}`}
@@ -1986,37 +2290,37 @@ export default function App() {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-3 pb-8">
+      <div className={`shrink-0 p-6 pt-2 space-y-3 relative z-10 ${t.base}`}>
+        <button
+          onClick={() => dispatch({ type: "START_GAME" })}
+          disabled={state.players.length < 2}
+          className={`w-full py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-20 flex items-center justify-center gap-2 ${isDark ? "bg-white text-black hover:bg-neutral-200" : "bg-slate-900 text-white hover:bg-slate-800 shadow-md"}`}
+        >
+          <Play size={20} fill="currentColor" /> Initialize Bank
+        </button>
+        <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => dispatch({ type: "START_GAME" })}
-            disabled={state.players.length < 2}
-            className={`w-full py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-20 flex items-center justify-center gap-2 ${isDark ? "bg-white text-black hover:bg-neutral-200" : "bg-slate-900 text-white hover:bg-slate-800 shadow-md"}`}
+            onClick={() => setIsEditingBoard(true)}
+            className={`border py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-95 ${t.card} ${t.textMuted} ${t.borderHover}`}
           >
-            <Play size={20} fill="currentColor" /> Initialize Bank
+            <Edit3 size={16} /> Edit Board
           </button>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setIsEditingBoard(true)}
-              className={`border py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-95 ${t.card} ${t.textMuted} ${t.borderHover}`}
+          <div className="relative">
+            <input
+              type="file"
+              id="import-file"
+              accept=".json,application/json"
+              onChange={handleImport}
+              className="hidden"
+            />
+            <label
+              htmlFor="import-file"
+              className={`w-full h-full border py-3 rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-95 ${t.card} ${t.textMuted} ${t.borderHover}`}
             >
-              <Edit3 size={16} /> Edit Board
-            </button>
-            <div className="relative">
-              <input
-                type="file"
-                id="import-file"
-                accept=".json,application/json"
-                onChange={handleImport}
-                className="hidden"
-              />
-              <label
-                htmlFor="import-file"
-                className={`w-full h-full border py-3 rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-95 ${t.card} ${t.textMuted} ${t.borderHover}`}
-              >
-                <Download size={16} /> Load Game
-              </label>
-            </div>
+              <Download size={16} /> Load Game
+            </label>
           </div>
         </div>
       </div>
@@ -2035,7 +2339,17 @@ export default function App() {
             const propDef = state.board.find((b) => b.id === propId);
             if (pState.mortgaged) propValue += propDef.price / 2;
             else propValue += propDef.price;
-            buildValue += pState.houses * (propDef.build || 0);
+
+            // Re-calculate dynamically based on houses/hotel
+            if (pState.houses > 0) {
+              const housesBeforeHotel = state.settings.housesBeforeHotel ?? 4;
+              const hotelCost = propDef.hotel ?? propDef.build;
+              if (pState.houses > housesBeforeHotel) {
+                buildValue += housesBeforeHotel * propDef.build + hotelCost;
+              } else {
+                buildValue += pState.houses * propDef.build;
+              }
+            }
           }
         });
         return {
@@ -2046,6 +2360,26 @@ export default function App() {
         };
       })
       .sort((a, b) => b.netWorth - a.netWorth);
+
+    const handleShareResults = async () => {
+      const text =
+        `🏆 BMS Final Rankings 🏆\n\n` +
+        rankedPlayers
+          .map((p, i) => `${i + 1}. ${p.name}: $${p.netWorth.toLocaleString()}`)
+          .join("\n");
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "BMS Results", text });
+          showToast("Results shared!");
+        } catch (e) {
+          // Fallback if sharing is aborted or fails
+        }
+      } else {
+        navigator.clipboard.writeText(text);
+        showToast("Results copied to clipboard!");
+      }
+    };
 
     return (
       <div className="flex-1 flex flex-col p-6 animate-in fade-in zoom-in-95 duration-500 ease-out relative overflow-hidden">
@@ -2104,7 +2438,13 @@ export default function App() {
           ))}
         </div>
 
-        <div className="shrink-0 max-w-md mx-auto w-full relative z-10 pb-4 pt-4">
+        <div className="shrink-0 max-w-md mx-auto w-full space-y-3 relative z-10 pb-4 pt-4">
+          <button
+            onClick={handleShareResults}
+            className={`w-full py-3 rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-95 transition-all duration-200 border flex items-center justify-center gap-2 ${t.card} ${t.textMain} ${t.borderHover}`}
+          >
+            <Share2 size={20} /> Share Results
+          </button>
           <button
             onClick={() => dispatch({ type: "RESET_GAME" })}
             className={`w-full py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-95 transition-all duration-200 ${isDark ? "bg-white text-black hover:bg-neutral-200" : "bg-slate-900 text-white hover:bg-slate-800 shadow-md"}`}
@@ -2143,7 +2483,7 @@ export default function App() {
                   <span
                     className={`font-bold text-lg tracking-tight ${t.textMain}`}
                   >
-                    B.A.B.E.
+                    BMS
                   </span>
                 </div>
               </header>
@@ -2151,33 +2491,67 @@ export default function App() {
               <main className="flex-1 overflow-y-auto pb-[90px] hide-scrollbar relative">
                 {activeTab === "home" && (
                   <div className="p-4 space-y-4 animate-in fade-in duration-300">
-                    <button
-                      onClick={() => setBankModal(true)}
-                      className={`w-full border rounded-3xl p-6 relative overflow-hidden text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] ${t.bankGradient} hover:border-emerald-500/50`}
+                    <div
+                      className={`grid ${state.settings.enableTreasureBucket !== false ? "grid-cols-2" : "grid-cols-1"} gap-3`}
                     >
-                      <div
-                        className={`absolute -right-4 -top-4 pointer-events-none transition-opacity ${isDark ? "opacity-5" : "opacity-[0.03] text-black"}`}
+                      <button
+                        onClick={() => setBankModal(true)}
+                        className={`w-full border rounded-3xl p-5 relative overflow-hidden text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${t.bankGradient} hover:border-emerald-500/50`}
                       >
-                        <Landmark size={140} />
-                      </div>
-                      <div className="relative z-10 flex justify-between items-end">
-                        <div>
-                          <p
-                            className={`font-bold uppercase tracking-widest text-xs mb-1 ${t.textMuted}`}
-                          >
-                            Central Bank
-                          </p>
-                          <p
-                            className={`text-4xl font-black font-mono tracking-tighter ${t.textMain}`}
-                          >
-                            ∞
-                          </p>
+                        <div
+                          className={`absolute -right-2 -top-2 pointer-events-none transition-opacity ${isDark ? "opacity-5" : "opacity-[0.03] text-black"}`}
+                        >
+                          <Landmark size={90} />
                         </div>
-                        <span className="text-emerald-500 text-xs font-bold uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                          Transfer
-                        </span>
-                      </div>
-                    </button>
+                        <div className="relative z-10 flex flex-col justify-between h-full">
+                          <div>
+                            <p
+                              className={`font-bold uppercase tracking-widest text-[10px] mb-1 ${t.textMuted}`}
+                            >
+                              Central Bank
+                            </p>
+                            <p
+                              className={`text-2xl font-black font-mono tracking-tighter ${t.textMain}`}
+                            >
+                              ∞
+                            </p>
+                          </div>
+                          <span className="text-emerald-500 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20 w-max mt-4">
+                            Transfer
+                          </span>
+                        </div>
+                      </button>
+
+                      {state.settings.enableTreasureBucket !== false && (
+                        <button
+                          onClick={() => setBucketModal(true)}
+                          className={`w-full border rounded-3xl p-5 relative overflow-hidden text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${t.card} hover:border-amber-500/50`}
+                        >
+                          <div
+                            className={`absolute -right-2 -top-2 pointer-events-none transition-opacity ${isDark ? "opacity-5" : "opacity-[0.03] text-black"}`}
+                          >
+                            <Coins size={90} />
+                          </div>
+                          <div className="relative z-10 flex flex-col justify-between h-full">
+                            <div>
+                              <p
+                                className={`font-bold uppercase tracking-widest text-[10px] mb-1 ${t.textMuted}`}
+                              >
+                                Treasure Bucket
+                              </p>
+                              <p
+                                className={`text-2xl font-black font-mono tracking-tighter ${state.treasureBucket > 0 ? "text-amber-500" : t.textMain}`}
+                              >
+                                ${state.treasureBucket || 0}
+                              </p>
+                            </div>
+                            <span className="text-amber-500 text-[10px] font-bold uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20 w-max mt-4">
+                              Claim
+                            </span>
+                          </div>
+                        </button>
+                      )}
+                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {state.players.map((p) => {
@@ -2284,6 +2658,10 @@ export default function App() {
                             )
                           : null;
 
+                        const housesBeforeHotel =
+                          state.settings.housesBeforeHotel ?? 4;
+                        const maxBuildings = housesBeforeHotel + 1;
+
                         return (
                           <div
                             key={p.id}
@@ -2328,10 +2706,10 @@ export default function App() {
                                       {p.type === "street" &&
                                         pState.houses > 0 && (
                                           <div className="flex gap-0.5">
-                                            {pState.houses === 5 ? (
+                                            {pState.houses === maxBuildings ? (
                                               <Building
-                                                size={12}
-                                                className="text-rose-500"
+                                                size={16}
+                                                className="text-rose-600 drop-shadow-md"
                                                 fill="currentColor"
                                               />
                                             ) : (
@@ -2340,8 +2718,8 @@ export default function App() {
                                               }).map((_, i) => (
                                                 <Home
                                                   key={i}
-                                                  size={12}
-                                                  className="text-emerald-500"
+                                                  size={14}
+                                                  className="text-emerald-500 drop-shadow-sm"
                                                   fill="currentColor"
                                                 />
                                               ))
@@ -2427,18 +2805,34 @@ export default function App() {
                                     <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base font-medium">
                                       <span
                                         className={
-                                          fromP ? fromP.color.text : t.textFaint
+                                          fromP
+                                            ? fromP.color.text
+                                            : tx.from === "BUCKET"
+                                              ? "text-amber-500"
+                                              : t.textFaint
                                         }
                                       >
-                                        {fromP ? fromP.name : "Bank"}
+                                        {fromP
+                                          ? fromP.name
+                                          : tx.from === "BUCKET"
+                                            ? "Bucket"
+                                            : "Bank"}
                                       </span>
                                       <span className={t.textFaint}>→</span>
                                       <span
                                         className={
-                                          toP ? toP.color.text : t.textFaint
+                                          toP
+                                            ? toP.color.text
+                                            : tx.to === "BUCKET"
+                                              ? "text-amber-500"
+                                              : t.textFaint
                                         }
                                       >
-                                        {toP ? toP.name : "Bank"}
+                                        {toP
+                                          ? toP.name
+                                          : tx.to === "BUCKET"
+                                            ? "Bucket"
+                                            : "Bank"}
                                       </span>
                                     </div>
                                   )}
@@ -2565,6 +2959,40 @@ export default function App() {
                     <div
                       className={`border rounded-3xl p-6 transition-colors ${t.card}`}
                     >
+                      <h3 className={`font-bold mb-1 ${t.textMain}`}>
+                        Construction Rules
+                      </h3>
+                      <p className={`text-sm mb-4 ${t.textMuted}`}>
+                        Number of houses required before building a Hotel.
+                      </p>
+                      <div
+                        className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${t.input}`}
+                      >
+                        <input
+                          type="number"
+                          min="1"
+                          max="5"
+                          value={state.settings.housesBeforeHotel ?? 4}
+                          onChange={(e) =>
+                            dispatch({
+                              type: "UPDATE_SETTINGS",
+                              payload: {
+                                housesBeforeHotel:
+                                  parseInt(e.target.value, 10) || 4,
+                              },
+                            })
+                          }
+                          className={`bg-transparent font-black w-full focus:outline-none ${t.textMain}`}
+                        />
+                        <span className="text-emerald-500 font-bold">
+                          <Home size={18} />
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`border rounded-3xl p-6 transition-colors ${t.card}`}
+                    >
                       <div className="flex justify-between items-center mb-4">
                         <div>
                           <h3 className={`font-bold ${t.textMain}`}>
@@ -2623,7 +3051,11 @@ export default function App() {
                               <span className="text-sky-500 font-bold">$</span>
                               <input
                                 type="number"
-                                value={state.settings.maxDebt}
+                                value={
+                                  state.settings.maxDebt === 0
+                                    ? ""
+                                    : state.settings.maxDebt
+                                }
                                 onChange={(e) =>
                                   dispatch({
                                     type: "UPDATE_SETTINGS",
@@ -2655,7 +3087,11 @@ export default function App() {
                       >
                         <input
                           type="number"
-                          value={state.settings.unmortgageInterest ?? 10}
+                          value={
+                            state.settings.unmortgageInterest === 0
+                              ? ""
+                              : state.settings.unmortgageInterest
+                          }
                           onChange={(e) =>
                             dispatch({
                               type: "UPDATE_SETTINGS",
@@ -2695,12 +3131,12 @@ export default function App() {
                         className={`font-bold mb-4 flex items-center gap-2 ${t.textMain}`}
                       >
                         <Info size={18} className="text-emerald-500" /> About
-                        B.A.B.E.
+                        BMS
                       </h3>
                       <div className="flex justify-between items-center">
                         <div>
                           <p className={`font-bold ${t.textMain}`}>
-                            Version 5.6.0
+                            Version 6.1.0 (Beta)
                           </p>
                           <p className={`text-sm ${t.textMuted}`}>
                             Developed by Yousuf with AI
@@ -2768,52 +3204,882 @@ export default function App() {
                   </button>
                 ))}
               </nav>
+            </div>
+          )}
 
-              {/* MODALS RENDERED INSIDE THE HARDWARE WRAPPER */}
-              {isEditingBoard && renderBoardEditor()}
-              {tradeWizard && renderTradeWizard()}
+          {/* OVERLAYS THAT MUST WORK EVERYWHERE */}
+          {isEditingBoard && renderBoardEditor()}
+          {tradeWizard && renderTradeWizard()}
 
-              {/* GLOBAL MONOPOLY POPUP OVERLAY */}
-              {monopolyAlert && (
-                <div
-                  className={`absolute inset-0 z-[400] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 fade-in duration-500 ${t.modalOverlay} backdrop-blur-md`}
+          {/* GLOBAL BMS GROUP POPUP OVERLAY */}
+          {bmsAlert && (
+            <div
+              onClick={() => setBmsAlert(null)}
+              className={`absolute inset-0 z-[400] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 fade-in duration-500 cursor-pointer ${t.modalOverlay} backdrop-blur-md`}
+            >
+              <PartyPopper
+                size={80}
+                className="text-emerald-500 mb-6 animate-bounce"
+              />
+              <div
+                className={`border-4 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_80px_rgba(16,185,129,0.3)] ${t.modalBg}`}
+                style={{
+                  borderColor: bmsAlert.color.startsWith("bg-[")
+                    ? bmsAlert.color.slice(4, -1)
+                    : undefined,
+                }}
+              >
+                <h2
+                  className={`text-3xl font-black mb-2 uppercase tracking-tighter ${t.textMain}`}
                 >
-                  <PartyPopper
-                    size={80}
-                    className="text-emerald-500 mb-6 animate-bounce"
-                  />
-                  <div
-                    className={`border-4 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_80px_rgba(16,185,129,0.3)] ${t.modalBg}`}
-                    style={{
-                      borderColor: monopolyAlert.color.startsWith("bg-[")
-                        ? monopolyAlert.color.slice(4, -1)
-                        : undefined,
-                    }}
-                  >
-                    <h2
-                      className={`text-4xl font-black mb-2 uppercase tracking-tighter ${t.textMain}`}
+                  Group Complete!
+                </h2>
+                <p className={`text-lg font-bold ${t.textMuted}`}>
+                  <span className={t.textMain}>{bmsAlert.playerName}</span> has
+                  completed the{" "}
+                  <span className={t.textMain}>{bmsAlert.groupName}</span>{" "}
+                  group!
+                </p>
+                <p className={`text-xs mt-4 ${t.textFaint}`}>
+                  Houses and Hotels can now be built. (Tap anywhere to dismiss)
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* GLOBAL JACKPOT/BUCKET POPUP OVERLAY */}
+          {jackpotAlert && (
+            <div
+              onClick={() => setJackpotAlert(null)}
+              className={`absolute inset-0 z-[400] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 fade-in duration-500 cursor-pointer ${t.modalOverlay} backdrop-blur-md`}
+            >
+              <Confetti />
+              <Coins
+                size={100}
+                className="text-amber-500 mb-6 animate-bounce drop-shadow-[0_0_30px_rgba(245,158,11,0.5)]"
+              />
+              <div
+                className={`border-4 border-amber-500 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_80px_rgba(245,158,11,0.3)] ${t.modalBg}`}
+              >
+                <h2
+                  className={`text-4xl font-black mb-2 uppercase tracking-tighter ${t.textMain}`}
+                >
+                  Jackpot!
+                </h2>
+                <p className={`text-lg font-bold ${t.textMuted}`}>
+                  <span className={t.textMain}>{jackpotAlert.playerName}</span>{" "}
+                  claimed the Treasure Bucket!
+                </p>
+                <p className={`text-3xl font-black mt-4 text-amber-500`}>
+                  +${jackpotAlert.amount.toLocaleString()}
+                </p>
+                <p
+                  className={`text-[10px] uppercase font-bold mt-6 ${t.textFaint}`}
+                >
+                  Tap anywhere to dismiss
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* GLOBAL TRADE POPUP OVERLAY */}
+          {tradeAlert && (
+            <div
+              onClick={() => setTradeAlert(null)}
+              className={`absolute inset-0 z-[400] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 fade-in duration-500 cursor-pointer ${t.modalOverlay} backdrop-blur-md`}
+            >
+              <Confetti />
+              <Handshake
+                size={80}
+                className="text-sky-500 mb-6 animate-bounce drop-shadow-[0_0_30px_rgba(14,165,233,0.5)]"
+              />
+              <div
+                className={`border-4 border-sky-500 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_80px_rgba(14,165,233,0.3)] ${t.modalBg}`}
+              >
+                <h2
+                  className={`text-3xl font-black mb-2 uppercase tracking-tighter ${t.textMain}`}
+                >
+                  Trade Complete!
+                </h2>
+                <p className={`text-lg font-bold ${t.textMuted}`}>
+                  A deal was struck between{" "}
+                  <span className={t.textMain}>{tradeAlert.p1Name}</span> and{" "}
+                  <span className={t.textMain}>{tradeAlert.p2Name}</span>
+                </p>
+                <p
+                  className={`text-[10px] uppercase font-bold mt-6 ${t.textFaint}`}
+                >
+                  Tap anywhere to dismiss
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* BUCKET MODAL */}
+          {bucketModal && (
+            <div
+              className={`absolute inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
+            >
+              <div
+                className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
+              >
+                <div
+                  className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b shrink-0 ${t.modalHeader}`}
+                >
+                  <div>
+                    <h3 className={`font-bold leading-tight ${t.textMain}`}>
+                      Treasure Bucket
+                    </h3>
+                    <span
+                      className={`text-xs uppercase font-bold tracking-widest text-amber-500`}
                     >
-                      Monopoly!
-                    </h2>
-                    <p className={`text-lg font-bold ${t.textMuted}`}>
-                      <span className={t.textMain}>
-                        {monopolyAlert.playerName}
-                      </span>{" "}
-                      has completed the{" "}
-                      <span className={t.textMain}>
-                        {monopolyAlert.groupName}
-                      </span>{" "}
-                      group!
-                    </p>
-                    <p className={`text-xs mt-4 ${t.textFaint}`}>
-                      Houses and Hotels can now be built.
-                    </p>
+                      ${state.treasureBucket || 0} Available
+                    </span>
+                  </div>
+                  <button
+                    onClick={closeModals}
+                    className={`p-3 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+                  <div className="mb-4">
+                    <label
+                      className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                    >
+                      Select player to claim bucket
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {state.players
+                        .filter((p) => !p.isBankrupt)
+                        .map((p) => (
+                          <button
+                            key={p.id}
+                            onClick={() => setTargetId(p.id)}
+                            className={`px-4 py-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all duration-200 ${targetId === p.id ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 scale-105" : `${t.input} ${t.textFaint} hover:border-amber-500/50`}`}
+                          >
+                            <span
+                              className={`w-3 h-3 rounded-full ${p.color.bg}`}
+                            ></span>
+                            <span className="font-bold">{p.name}</span>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (!targetId || !state.treasureBucket) return;
+                      dispatch({ type: "CLEAR_ERROR" });
+                      dispatch({
+                        type: "TRANSACT",
+                        payload: {
+                          from: "BUCKET",
+                          to: targetId,
+                          amount: state.treasureBucket,
+                          type: "B2P",
+                        },
+                      });
+                    }}
+                    disabled={!targetId || !state.treasureBucket}
+                    className={`w-full py-4 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200 ${!targetId || !state.treasureBucket ? "opacity-50 cursor-not-allowed " + t.input : "bg-amber-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-95"}`}
+                  >
+                    <Check size={24} strokeWidth={3} /> Claim Full Bucket
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* BANK MODAL */}
+          {bankModal && (
+            <div
+              className={`absolute inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
+            >
+              <div
+                className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
+              >
+                <div
+                  className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b shrink-0 ${t.modalHeader}`}
+                >
+                  <div>
+                    <h3 className={`font-bold leading-tight ${t.textMain}`}>
+                      Central Bank
+                    </h3>
+                    <span
+                      className={`text-xs uppercase font-bold tracking-widest ${t.textMuted}`}
+                    >
+                      Bank Transfer
+                    </span>
+                  </div>
+                  <button
+                    onClick={closeModals}
+                    className={`p-3 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+                  <div className="mb-4">
+                    <label
+                      className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                    >
+                      Recipient (Push Money To)
+                    </label>
+                    <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+                      {state.players
+                        .filter((p) => !p.isBankrupt)
+                        .map((p) => (
+                          <button
+                            key={p.id}
+                            onClick={() => setTargetId(p.id)}
+                            className={`flex-shrink-0 px-4 py-2 rounded-xl border transition-all duration-200 ${targetId === p.id ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 scale-105" : `${t.input} ${t.textFaint} hover:border-emerald-500/50`}`}
+                          >
+                            {p.name}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+
+                  <div
+                    className={`mb-4 rounded-2xl border py-2 flex flex-col items-center justify-center relative transition-colors ${t.card}`}
+                  >
+                    <div
+                      className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest ${t.textFaint}`}
+                    >
+                      Amount
+                    </div>
+                    <div className="flex items-start justify-center gap-1">
+                      <span
+                        className={`text-xl mt-1.5 font-bold ${t.textMuted}`}
+                      >
+                        $
+                      </span>
+                      <span
+                        className={`text-5xl font-black tracking-tighter truncate max-w-[250px] ${amountStr === "0" ? t.textFaint : "text-emerald-500"}`}
+                      >
+                        {parseInt(amountStr || 0, 10).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => handleNumpad(num.toString())}
+                        className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => handleNumpad("00")}
+                      className={`h-12 rounded-2xl text-lg font-black transition-all ${t.numpad}`}
+                    >
+                      00
+                    </button>
+                    <button
+                      onClick={() => handleNumpad("0")}
+                      className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
+                    >
+                      0
+                    </button>
+                    <button
+                      onClick={() => handleNumpad("DEL")}
+                      className={`h-12 rounded-2xl flex items-center justify-center transition-all ${t.numpadDel}`}
+                    >
+                      <X size={24} strokeWidth={3} />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (!targetId || amountStr === "0") return;
+                      dispatch({ type: "CLEAR_ERROR" });
+                      dispatch({
+                        type: "TRANSACT",
+                        payload: {
+                          from: "BANK",
+                          to: targetId,
+                          amount: amountStr,
+                          type: "B2P",
+                          msgOverride: "Bank transferred Go Cash/Bonus",
+                        },
+                      });
+                    }}
+                    disabled={!targetId || amountStr === "0"}
+                    className={`w-full py-3 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200 ${!targetId || amountStr === "0" ? "opacity-50 cursor-not-allowed " + t.input : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95"}`}
+                  >
+                    <Check size={24} strokeWidth={3} /> Send to Player
+                  </button>
+
+                  <div className="mt-8 pt-4 border-t border-black/10 flex justify-between items-center">
+                    <div>
+                      <h4 className={`font-bold ${t.textMain}`}>
+                        Treasure Bucket
+                      </h4>
+                      <p
+                        className={`text-[10px] uppercase font-bold tracking-widest ${t.textMuted}`}
+                      >
+                        Global visibility
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        dispatch({
+                          type: "UPDATE_SETTINGS",
+                          payload: {
+                            enableTreasureBucket:
+                              state.settings.enableTreasureBucket === false
+                                ? true
+                                : false,
+                          },
+                        })
+                      }
+                      className={`w-12 h-6 rounded-full transition-colors relative ${state.settings.enableTreasureBucket !== false ? "bg-amber-500" : isDark ? "bg-neutral-700" : "bg-slate-300"}`}
+                    >
+                      <div
+                        className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${state.settings.enableTreasureBucket !== false ? "translate-x-6" : "translate-x-0"}`}
+                      />
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
+            </div>
+          )}
 
-              {/* BANK MODAL */}
-              {bankModal && (
+          {/* PROPERTY MODAL */}
+          {activePropId &&
+            (() => {
+              const propDef = state.board.find((p) => p.id === activePropId);
+              if (!propDef) return null;
+              const pState = state.propertyState[activePropId] || {
+                ownerId: null,
+                houses: 0,
+                mortgaged: false,
+              };
+              const isOwned = !!pState.ownerId;
+              const owner = isOwned
+                ? state.players.find((p) => p.id === pState.ownerId)
+                : null;
+              const unmortgageCost = Math.ceil(
+                propDef.mort *
+                  (1 + (state.settings.unmortgageInterest ?? 10) / 100),
+              );
+
+              const housesBeforeHotel = state.settings.housesBeforeHotel ?? 4;
+              const maxBuildings = housesBeforeHotel + 1;
+              const isNextHotel = pState.houses === housesBeforeHotel;
+              const isCurrentHotel = pState.houses === maxBuildings;
+
+              const nextBuildCost = isNextHotel
+                ? (propDef.hotel ?? propDef.build)
+                : propDef.build;
+              const currentSellValue = isCurrentHotel
+                ? (propDef.hotel ?? propDef.build) / 2
+                : propDef.build / 2;
+
+              const handlePropAction = () => {
+                dispatch({ type: "CLEAR_ERROR" });
+
+                // Pre-Transaction UI Barrier
+                let cost = 0;
+                if (propConfirmAction.type === "BUY")
+                  cost = propConfirmAction.amount;
+                if (propConfirmAction.type === "BUILD")
+                  cost = propConfirmAction.amount;
+                if (propConfirmAction.type === "UNMORTGAGE")
+                  cost = unmortgageCost;
+                if (propConfirmAction.type === "HOSTILE_TAKEOVER")
+                  cost = propDef.price * 2;
+
+                const activePlayerToCheck =
+                  propConfirmAction.type === "HOSTILE_TAKEOVER"
+                    ? state.players.find(
+                        (p) => p.id === propConfirmAction.playerId,
+                      )
+                    : propConfirmAction.type === "BUY"
+                      ? state.players.find(
+                          (p) => p.id === propConfirmAction.playerId,
+                        )
+                      : owner;
+
+                if (cost > 0 && activePlayerToCheck.balance < cost) {
+                  showToast(`Insufficient funds! Need $${cost}.`, "error");
+                  setPropConfirmAction(null);
+                  return;
+                }
+
+                // Specific Debt Block for Real Estate
+                if (
+                  (propConfirmAction.type === "BUY" ||
+                    propConfirmAction.type === "BUILD") &&
+                  activePlayerToCheck.debt > 0
+                ) {
+                  showToast(
+                    "Cannot buy/build while in debt. Repay loan first.",
+                    "error",
+                  );
+                  setPropConfirmAction(null);
+                  return;
+                }
+
+                if (propConfirmAction.type === "HOSTILE_TAKEOVER") {
+                  dispatch({
+                    type: "HOSTILE_TAKEOVER",
+                    payload: {
+                      propertyId: activePropId,
+                      buyerId: propConfirmAction.playerId,
+                    },
+                  });
+                } else {
+                  dispatch({
+                    type: "PROPERTY_ACTION",
+                    payload: {
+                      actionType: propConfirmAction.type,
+                      propertyId: activePropId,
+                      playerId: propConfirmAction.playerId,
+                      amount: propConfirmAction.amount,
+                      targetPlayerId: propConfirmAction.targetId,
+                    },
+                  });
+                }
+              };
+
+              return (
+                <div
+                  className={`absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out p-4 ${t.modalOverlay}`}
+                >
+                  <div
+                    className={`w-full max-w-sm rounded-3xl border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 ease-out relative ${t.modalBg}`}
+                  >
+                    {propConfirmAction && (
+                      <div
+                        className={`absolute inset-0 z-[70] backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in text-center bg-opacity-95 ${t.modalBg}`}
+                      >
+                        <h3 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                          Confirm Action
+                        </h3>
+                        <p className={`mb-6 text-sm ${t.textMuted}`}>
+                          {propConfirmAction.type === "BUY" &&
+                            `Buy for $${propConfirmAction.amount}?`}
+                          {propConfirmAction.type === "BUILD" &&
+                            `Build for $${propConfirmAction.amount}?`}
+                          {propConfirmAction.type === "SELL_BUILD" &&
+                            `Sell for $${propConfirmAction.amount}?`}
+                          {propConfirmAction.type === "MORTGAGE" &&
+                            `Mortgage and receive $${propConfirmAction.amount}?`}
+                          {propConfirmAction.type === "UNMORTGAGE" &&
+                            `Unmortgage for $${propConfirmAction.amount}?`}
+                          {propConfirmAction.type === "TRANSFER" &&
+                            `Transfer ownership to selected player?`}
+                          {propConfirmAction.type === "HOSTILE_TAKEOVER" &&
+                            `Pay $${propConfirmAction.amount} to seize asset?`}
+                        </p>
+                        <div className="flex gap-3 w-full">
+                          <button
+                            onClick={() => {
+                              setPropConfirmAction(null);
+                              dispatch({ type: "CLEAR_ERROR" });
+                            }}
+                            className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handlePropAction}
+                            className="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                          >
+                            Confirm
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`${propDef.color.startsWith("bg-[") ? propDef.color : propDef.color.replace("bg-", "bg-")} ${propDef.text || "text-white"} p-6 relative border-b border-black/10 flex items-center gap-3`}
+                    >
+                      <button
+                        onClick={closeModals}
+                        className="absolute top-2 right-2 p-3 z-[60] bg-black/20 hover:bg-black/40 rounded-full transition-colors backdrop-blur-md text-white"
+                      >
+                        <X size={20} />
+                      </button>
+                      {propDef.icon &&
+                        renderDynamicIcon(
+                          propDef.icon,
+                          32,
+                          "opacity-50 shrink-0",
+                        )}
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">
+                          Title Deed
+                        </p>
+                        <h2 className="text-2xl font-black leading-tight">
+                          {propDef.name}
+                        </h2>
+                      </div>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                      {!isOwned ? (
+                        <div className="space-y-4">
+                          <div className="text-center relative">
+                            <span
+                              className={`text-sm font-bold block mb-1 ${t.textMuted}`}
+                            >
+                              Purchase Price
+                            </span>
+                            {isEditingBuyPrice ? (
+                              <div className="flex items-center justify-center gap-2">
+                                <span
+                                  className={`text-4xl font-black ${t.textMain}`}
+                                >
+                                  $
+                                </span>
+                                <input
+                                  type="number"
+                                  autoFocus
+                                  value={
+                                    customBuyPrice === "0" ? "" : customBuyPrice
+                                  }
+                                  onChange={(e) =>
+                                    setCustomBuyPrice(e.target.value || "0")
+                                  }
+                                  className={`w-28 text-4xl font-black bg-transparent border-b-2 border-emerald-500 focus:outline-none text-center ${t.textMain}`}
+                                />
+                                <button
+                                  onClick={() => setIsEditingBuyPrice(false)}
+                                  className="p-2 bg-emerald-500 text-white rounded-full hover:bg-emerald-400 active:scale-95 transition-all"
+                                >
+                                  <Check size={16} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center gap-2">
+                                <span
+                                  className={`text-4xl font-black ${t.textMain}`}
+                                >
+                                  ${customBuyPrice}
+                                </span>
+                                <button
+                                  onClick={() => setIsEditingBuyPrice(true)}
+                                  className={`p-2 rounded-full transition-colors ${isDark ? "text-emerald-400 hover:bg-emerald-400/10" : "text-emerald-600 hover:bg-emerald-600/10"}`}
+                                >
+                                  <Edit3 size={18} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <label
+                              className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                            >
+                              Select Buyer
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {state.players
+                                .filter((p) => !p.isBankrupt)
+                                .map((p) => (
+                                  <button
+                                    key={p.id}
+                                    onClick={() =>
+                                      setPropConfirmAction({
+                                        type: "BUY",
+                                        playerId: p.id,
+                                        amount:
+                                          parseInt(customBuyPrice, 10) || 0,
+                                      })
+                                    }
+                                    className={`py-3 rounded-xl border flex flex-col items-center gap-1 transition-all duration-200 active:scale-95 ${t.input} ${t.borderHover}`}
+                                  >
+                                    <span
+                                      className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                    ></span>
+                                    <span
+                                      className={`text-xs font-bold truncate w-full text-center px-1 ${t.textMain}`}
+                                    >
+                                      {p.name}
+                                    </span>
+                                  </button>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-5">
+                          <div
+                            className={`flex justify-between items-center p-3 rounded-xl border transition-colors ${t.modalHeader}`}
+                          >
+                            <span
+                              className={`text-xs font-bold ${t.textMuted}`}
+                            >
+                              Owner
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`w-2 h-2 rounded-full ${owner.color.bg}`}
+                              ></span>
+                              <span
+                                className={`font-bold text-sm ${t.textMain}`}
+                              >
+                                {owner.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          {pState.mortgaged ? (
+                            <div className="text-center space-y-4">
+                              <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl">
+                                <AlertOctagon
+                                  size={24}
+                                  className="text-rose-500 mx-auto mb-2"
+                                />
+                                <span className="text-rose-500 font-bold block">
+                                  Property Mortgaged
+                                </span>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  setPropConfirmAction({
+                                    type: "UNMORTGAGE",
+                                    playerId: owner.id,
+                                    amount: unmortgageCost,
+                                  })
+                                }
+                                className="w-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                              >
+                                Unmortgage (${unmortgageCost})
+                              </button>
+
+                              <div
+                                className={`pt-4 border-t text-left ${t.border}`}
+                              >
+                                <label className="text-[10px] text-rose-500 font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                  <Swords size={12} /> Hostile Takeover (2x
+                                  Price)
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {state.players
+                                    .filter(
+                                      (p) => p.id !== owner.id && !p.isBankrupt,
+                                    )
+                                    .map((p) => (
+                                      <button
+                                        key={p.id}
+                                        onClick={() =>
+                                          setPropConfirmAction({
+                                            type: "HOSTILE_TAKEOVER",
+                                            playerId: p.id,
+                                            amount: propDef.price * 2,
+                                          })
+                                        }
+                                        className="px-3 py-2 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-95"
+                                      >
+                                        <div className="flex items-center gap-1">
+                                          <span
+                                            className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                          ></span>
+                                          <span
+                                            className={`text-xs font-bold ${isDark ? "text-rose-300" : "text-rose-600"}`}
+                                          >
+                                            {p.name}
+                                          </span>
+                                        </div>
+                                      </button>
+                                    ))}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              {propDef.type === "street" &&
+                                (() => {
+                                  const groupProps = state.board.filter(
+                                    (b) => b.group === propDef.group,
+                                  );
+                                  const groupStates = groupProps.map(
+                                    (b) =>
+                                      state.propertyState[b.id] || {
+                                        houses: 0,
+                                      },
+                                  );
+                                  const hasFullGroup = groupProps.every(
+                                    (b) =>
+                                      state.propertyState[b.id]?.ownerId ===
+                                      owner.id,
+                                  );
+                                  const anyMortgagedInGroup = groupProps.some(
+                                    (b) => state.propertyState[b.id]?.mortgaged,
+                                  );
+
+                                  const minGroupHouses = Math.min(
+                                    ...groupStates.map((s) => s.houses),
+                                  );
+                                  const maxGroupHouses = Math.max(
+                                    ...groupStates.map((s) => s.houses),
+                                  );
+
+                                  const isEvenBuild =
+                                    pState.houses === minGroupHouses;
+                                  const isEvenSell =
+                                    pState.houses === maxGroupHouses;
+
+                                  const canBuild =
+                                    hasFullGroup && !anyMortgagedInGroup;
+
+                                  return (
+                                    <div
+                                      className={`p-4 rounded-xl border transition-colors ${t.modalHeader}`}
+                                    >
+                                      <div className="flex justify-between items-center mb-4">
+                                        <span
+                                          className={`text-xs font-bold ${t.textMuted}`}
+                                        >
+                                          Development
+                                        </span>
+                                        <div className="flex gap-1">
+                                          {pState.houses === maxBuildings ? (
+                                            <Building
+                                              size={18}
+                                              className="text-rose-600 drop-shadow-md"
+                                              fill="currentColor"
+                                            />
+                                          ) : (
+                                            Array.from({
+                                              length: pState.houses,
+                                            }).map((_, i) => (
+                                              <Home
+                                                key={i}
+                                                size={14}
+                                                className="text-emerald-500 drop-shadow-sm"
+                                                fill="currentColor"
+                                              />
+                                            ))
+                                          )}
+                                          {pState.houses === 0 && (
+                                            <span
+                                              className={`text-xs font-bold ${t.textFaint}`}
+                                            >
+                                              Empty Lot
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2 flex-col sm:flex-row">
+                                        <button
+                                          onClick={() =>
+                                            setPropConfirmAction({
+                                              type: "BUILD",
+                                              playerId: owner.id,
+                                              amount: nextBuildCost,
+                                            })
+                                          }
+                                          disabled={
+                                            pState.houses >= maxBuildings ||
+                                            !canBuild ||
+                                            !isEvenBuild
+                                          }
+                                          className={`flex-1 disabled:opacity-50 text-emerald-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-emerald-500/50`}
+                                        >
+                                          Build ({nextBuildCost})
+                                        </button>
+                                        <button
+                                          onClick={() =>
+                                            setPropConfirmAction({
+                                              type: "SELL_BUILD",
+                                              playerId: owner.id,
+                                              amount: currentSellValue,
+                                            })
+                                          }
+                                          disabled={
+                                            pState.houses === 0 || !isEvenSell
+                                          }
+                                          className={`flex-1 disabled:opacity-50 text-rose-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-rose-500/50`}
+                                        >
+                                          Sell ({currentSellValue})
+                                        </button>
+                                      </div>
+                                      {!hasFullGroup ? (
+                                        <p
+                                          className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
+                                        >
+                                          Requires full {propDef.group} set to
+                                          build.
+                                        </p>
+                                      ) : anyMortgagedInGroup ? (
+                                        <p
+                                          className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
+                                        >
+                                          Cannot build while a {propDef.group}{" "}
+                                          property is mortgaged.
+                                        </p>
+                                      ) : !isEvenBuild &&
+                                        pState.houses < maxBuildings ? (
+                                        <p
+                                          className={`text-[10px] font-bold text-amber-500 mt-3 text-center`}
+                                        >
+                                          Must build evenly across the{" "}
+                                          {propDef.group} group.
+                                        </p>
+                                      ) : null}
+                                    </div>
+                                  );
+                                })()}
+                              <button
+                                onClick={() =>
+                                  setPropConfirmAction({
+                                    type: "MORTGAGE",
+                                    playerId: owner.id,
+                                    amount: propDef.mort,
+                                  })
+                                }
+                                disabled={pState.houses > 0}
+                                className={`w-full disabled:opacity-50 text-amber-500 font-bold py-3 rounded-xl transition-all duration-200 active:scale-95 border ${t.input} hover:border-amber-500/50`}
+                              >
+                                Mortgage to Bank (+${propDef.mort})
+                              </button>
+                            </div>
+                          )}
+
+                          {!pState.mortgaged && (
+                            <div className={`pt-4 border-t ${t.border}`}>
+                              <button
+                                onClick={() => {
+                                  setTradeWizard({
+                                    step: 1,
+                                    p1Id: owner.id,
+                                    p1Offer: {
+                                      cash: 0,
+                                      props: [activePropId],
+                                    },
+                                    p2Offer: { cash: 0, props: [] },
+                                  });
+                                  setActivePropId(null);
+                                }}
+                                className={`w-full py-3 rounded-xl border font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${t.input} hover:border-sky-500 text-sky-500`}
+                              >
+                                <ArrowRightLeft size={16} /> Open Trade Wizard
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+          {/* PLAYER TRANSACTION MODAL */}
+          {modalConfig &&
+            activeP &&
+            (() => {
+              return (
                 <div
                   className={`absolute inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
                 >
@@ -2823,45 +4089,119 @@ export default function App() {
                     <div
                       className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b shrink-0 ${t.modalHeader}`}
                     >
-                      <div>
-                        <h3 className={`font-bold leading-tight ${t.textMain}`}>
-                          Central Bank
-                        </h3>
-                        <span
-                          className={`text-xs uppercase font-bold tracking-widest ${t.textMuted}`}
-                        >
-                          Bank Transfer
-                        </span>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-3 h-3 rounded-full ${activeP.color.bg}`}
+                        ></div>
+                        <div>
+                          <h3
+                            className={`font-bold leading-tight ${t.textMain}`}
+                          >
+                            {activeP.name}
+                          </h3>
+                          <div className="flex gap-2 text-xs font-mono font-medium">
+                            <span className="text-emerald-500">
+                              Bal: ${activeP.balance.toLocaleString()}
+                            </span>
+                            {activeP.debt > 0 && (
+                              <span className="text-rose-500">
+                                Debt: -${activeP.debt.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <button
                         onClick={closeModals}
-                        className={`p-3 rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
+                        className={`p-3 z-[60] rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
                       >
                         <X size={20} />
                       </button>
                     </div>
 
-                    <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
-                      <div className="mb-4">
-                        <label
-                          className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                    <div
+                      className={`flex p-2 gap-2 border-b overflow-x-auto hide-scrollbar shrink-0 ${t.modalHeader}`}
+                    >
+                      <button
+                        onClick={() => {
+                          setTxType("PAY_PLAYER");
+                          dispatch({ type: "CLEAR_ERROR" });
+                        }}
+                        className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_PLAYER" ? "bg-sky-500 text-white shadow-md shadow-sky-500/20" : t.actionTabNormal}`}
+                      >
+                        Pay Player
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTxType("PAY_BANK");
+                          dispatch({ type: "CLEAR_ERROR" });
+                        }}
+                        className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_BANK" ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20" : t.actionTabNormal}`}
+                      >
+                        Pay Bank
+                      </button>
+                      {state.settings.enableTreasureBucket !== false && (
+                        <button
+                          onClick={() => {
+                            setTxType("PAY_BUCKET");
+                            dispatch({ type: "CLEAR_ERROR" });
+                          }}
+                          className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_BUCKET" ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" : t.actionTabNormal}`}
                         >
-                          Recipient (Push Money To)
-                        </label>
-                        <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
-                          {state.players
-                            .filter((p) => !p.isBankrupt)
-                            .map((p) => (
+                          Pay Bucket
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setTxType("DEBT");
+                          dispatch({ type: "CLEAR_ERROR" });
+                        }}
+                        disabled={!state.settings.enableDebt}
+                        className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "DEBT" ? "bg-rose-500 text-white shadow-md shadow-rose-500/20" : t.actionTabNormal} ${!state.settings.enableDebt ? "opacity-30 cursor-not-allowed hover:bg-transparent" : ""}`}
+                      >
+                        Take Loan
+                      </button>
+                      {activeP.debt > 0 && (
+                        <button
+                          onClick={() => {
+                            setTxType("REPAY");
+                            dispatch({ type: "CLEAR_ERROR" });
+                          }}
+                          className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "REPAY" ? "bg-purple-500 text-white shadow-md shadow-purple-500/20" : t.actionTabNormal}`}
+                        >
+                          Repay
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+                      {txType === "PAY_PLAYER" && (
+                        <div className="mb-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                          <label
+                            className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
+                          >
+                            Recipient
+                          </label>
+                          <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+                            {availableTargets.map((p) => (
                               <button
                                 key={p.id}
                                 onClick={() => setTargetId(p.id)}
-                                className={`flex-shrink-0 px-4 py-2 rounded-xl border transition-all duration-200 ${targetId === p.id ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 scale-105" : `${t.input} ${t.textFaint} hover:border-emerald-500/50`}`}
+                                className={`flex-shrink-0 px-4 py-2 rounded-xl border transition-all duration-200 flex items-center gap-2 ${targetId === p.id ? `border-sky-500 shadow-md ${t.p2pTag} scale-105` : `${t.input} ${t.textFaint} hover:border-sky-500/50`}`}
                               >
-                                {p.name}
+                                <span
+                                  className={`w-2 h-2 rounded-full ${p.color.bg}`}
+                                ></span>
+                                <span
+                                  className={`font-semibold text-sm ${targetId === p.id ? t.textMain : ""}`}
+                                >
+                                  {p.name}
+                                </span>
                               </button>
                             ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <div
                         className={`mb-4 rounded-2xl border py-2 flex flex-col items-center justify-center relative transition-colors ${t.card}`}
@@ -2878,7 +4218,7 @@ export default function App() {
                             $
                           </span>
                           <span
-                            className={`text-5xl font-black tracking-tighter truncate max-w-[250px] ${amountStr === "0" ? t.textFaint : "text-emerald-500"}`}
+                            className={`text-5xl font-black tracking-tighter truncate max-w-[250px] transition-colors ${amountStr === "0" ? t.textFaint : txType === "PAY_BANK" ? "text-emerald-500" : txType === "PAY_BUCKET" ? "text-amber-500" : txType === "DEBT" || txType === "REPAY" ? "text-rose-500" : "text-sky-500"}`}
                           >
                             {parseInt(amountStr || 0, 10).toLocaleString()}
                           </span>
@@ -2916,808 +4256,157 @@ export default function App() {
                       </div>
 
                       <button
+                        onClick={executeTx}
+                        disabled={
+                          amountStr === "0" ||
+                          (txType === "PAY_PLAYER" && !targetId)
+                        }
+                        className={`w-full py-3 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200
+                          ${amountStr === "0" || (txType === "PAY_PLAYER" && !targetId) ? `opacity-50 cursor-not-allowed ${t.input}` : txType === "PAY_BANK" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95" : txType === "PAY_BUCKET" ? "bg-amber-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-95" : txType === "DEBT" ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-95" : txType === "REPAY" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30 hover:scale-[1.02] active:scale-95" : "bg-sky-500 text-white shadow-lg shadow-sky-500/30 hover:scale-[1.02] active:scale-95"}`}
+                      >
+                        <Check size={24} strokeWidth={3} />{" "}
+                        {txType === "DEBT"
+                          ? "Request Loan"
+                          : txType === "REPAY"
+                            ? "Repay Debt"
+                            : "Confirm"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+          {/* AUTO BANKRUPTCY POPUP */}
+          {state.pendingBankruptcy &&
+            (() => {
+              const p = state.players.find(
+                (p) => p.id === state.pendingBankruptcy,
+              );
+              return (
+                <div
+                  className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+                >
+                  <div
+                    className={`border border-rose-500/50 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 ease-out ${t.modalBg}`}
+                  >
+                    <div className="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mb-4 ring-2 ring-rose-500/20">
+                      <AlertOctagon size={32} />
+                    </div>
+                    <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                      Zero Balance Reached
+                    </h2>
+                    <p className={`text-sm mb-6 ${t.textMuted}`}>
+                      <strong className={t.textMain}>{p.name}</strong> has
+                      exactly $0. Raise funds or declare bankruptcy.
+                    </p>
+                    <div className="flex flex-col gap-3 w-full">
+                      <button
+                        onClick={() => dispatch({ type: "DISMISS_BANKRUPTCY" })}
+                        className={`w-full py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                      >
+                        Resolve Debt Manually
+                      </button>
+                      <button
                         onClick={() => {
-                          if (!targetId || amountStr === "0") return;
-                          dispatch({ type: "CLEAR_ERROR" });
                           dispatch({
-                            type: "TRANSACT",
-                            payload: {
-                              from: "BANK",
-                              to: targetId,
-                              amount: amountStr,
-                              type: "B2P",
-                              msgOverride: "Bank transferred Go Cash/Bonus",
-                            },
+                            type: "BANKRUPT_PLAYER",
+                            payload: p.id,
                           });
+                          showToast(`${p.name} is bankrupt`, "error");
                         }}
-                        disabled={!targetId || amountStr === "0"}
-                        className={`w-full py-3 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200 ${!targetId || amountStr === "0" ? "opacity-50 cursor-not-allowed " + t.input : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95"}`}
+                        className="w-full py-3 bg-rose-500/10 text-rose-500 font-bold rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-all duration-200 active:scale-95"
                       >
-                        <Check size={24} strokeWidth={3} /> Send to Player
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* PROPERTY MODAL */}
-              {activePropId &&
-                (() => {
-                  const propDef = state.board.find(
-                    (p) => p.id === activePropId,
-                  );
-                  if (!propDef) return null;
-                  const pState = state.propertyState[activePropId] || {
-                    ownerId: null,
-                    houses: 0,
-                    mortgaged: false,
-                  };
-                  const isOwned = !!pState.ownerId;
-                  const owner = isOwned
-                    ? state.players.find((p) => p.id === pState.ownerId)
-                    : null;
-                  const unmortgageCost = Math.ceil(
-                    propDef.mort *
-                      (1 + (state.settings.unmortgageInterest ?? 10) / 100),
-                  );
-
-                  const handlePropAction = () => {
-                    dispatch({ type: "CLEAR_ERROR" });
-
-                    // Pre-Transaction UI Barrier
-                    let cost = 0;
-                    if (propConfirmAction.type === "BUY") cost = propDef.price;
-                    if (propConfirmAction.type === "BUILD")
-                      cost = propDef.build;
-                    if (propConfirmAction.type === "UNMORTGAGE")
-                      cost = unmortgageCost;
-                    if (propConfirmAction.type === "HOSTILE_TAKEOVER")
-                      cost = propDef.price * 2;
-
-                    const activePlayerToCheck =
-                      propConfirmAction.type === "HOSTILE_TAKEOVER"
-                        ? state.players.find(
-                            (p) => p.id === propConfirmAction.playerId,
-                          )
-                        : propConfirmAction.type === "BUY"
-                          ? state.players.find(
-                              (p) => p.id === propConfirmAction.playerId,
-                            )
-                          : owner;
-
-                    if (cost > 0 && activePlayerToCheck.balance < cost) {
-                      showToast(`Insufficient funds! Need $${cost}.`, "error");
-                      setPropConfirmAction(null);
-                      return;
-                    }
-
-                    // Specific Debt Block for Real Estate
-                    if (
-                      (propConfirmAction.type === "BUY" ||
-                        propConfirmAction.type === "BUILD") &&
-                      activePlayerToCheck.debt > 0
-                    ) {
-                      showToast(
-                        "Cannot buy/build while in debt. Repay loan first.",
-                        "error",
-                      );
-                      setPropConfirmAction(null);
-                      return;
-                    }
-
-                    if (propConfirmAction.type === "HOSTILE_TAKEOVER") {
-                      dispatch({
-                        type: "HOSTILE_TAKEOVER",
-                        payload: {
-                          propertyId: activePropId,
-                          buyerId: propConfirmAction.playerId,
-                        },
-                      });
-                    } else {
-                      dispatch({
-                        type: "PROPERTY_ACTION",
-                        payload: {
-                          actionType: propConfirmAction.type,
-                          propertyId: activePropId,
-                          playerId: propConfirmAction.playerId,
-                          amount: propConfirmAction.amount,
-                          targetPlayerId: propConfirmAction.targetId,
-                        },
-                      });
-                    }
-                  };
-
-                  return (
-                    <div
-                      className={`absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out p-4 ${t.modalOverlay}`}
-                    >
-                      <div
-                        className={`w-full max-w-sm rounded-3xl border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 ease-out relative ${t.modalBg}`}
-                      >
-                        {propConfirmAction && (
-                          <div
-                            className={`absolute inset-0 z-[70] backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in text-center bg-opacity-95 ${t.modalBg}`}
-                          >
-                            <h3
-                              className={`text-xl font-black mb-2 ${t.textMain}`}
-                            >
-                              Confirm Action
-                            </h3>
-                            <p className={`mb-6 text-sm ${t.textMuted}`}>
-                              {propConfirmAction.type === "BUY" &&
-                                `Buy for $${propConfirmAction.amount}?`}
-                              {propConfirmAction.type === "BUILD" &&
-                                `Build for $${propConfirmAction.amount}?`}
-                              {propConfirmAction.type === "SELL_BUILD" &&
-                                `Sell for $${propConfirmAction.amount}?`}
-                              {propConfirmAction.type === "MORTGAGE" &&
-                                `Mortgage and receive $${propConfirmAction.amount}?`}
-                              {propConfirmAction.type === "UNMORTGAGE" &&
-                                `Unmortgage for $${propConfirmAction.amount}?`}
-                              {propConfirmAction.type === "TRANSFER" &&
-                                `Transfer ownership to selected player?`}
-                              {propConfirmAction.type === "HOSTILE_TAKEOVER" &&
-                                `Pay $${propConfirmAction.amount} to seize asset?`}
-                            </p>
-                            <div className="flex gap-3 w-full">
-                              <button
-                                onClick={() => {
-                                  setPropConfirmAction(null);
-                                  dispatch({ type: "CLEAR_ERROR" });
-                                }}
-                                className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={handlePropAction}
-                                className="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                              >
-                                Confirm
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        <div
-                          className={`${propDef.color.startsWith("bg-[") ? propDef.color : propDef.color.replace("bg-", "bg-")} ${propDef.text || "text-white"} p-6 relative border-b border-black/10 flex items-center gap-3`}
-                        >
-                          <button
-                            onClick={closeModals}
-                            className="absolute top-2 right-2 p-3 z-[60] bg-black/20 hover:bg-black/40 rounded-full transition-colors backdrop-blur-md text-white"
-                          >
-                            <X size={20} />
-                          </button>
-                          {propDef.icon &&
-                            renderDynamicIcon(
-                              propDef.icon,
-                              32,
-                              "opacity-50 shrink-0",
-                            )}
-                          <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">
-                              Title Deed
-                            </p>
-                            <h2 className="text-2xl font-black leading-tight">
-                              {propDef.name}
-                            </h2>
-                          </div>
-                        </div>
-
-                        <div className="p-6 space-y-6">
-                          {!isOwned ? (
-                            <div className="space-y-4">
-                              <div className="text-center">
-                                <span
-                                  className={`text-sm font-bold block mb-1 ${t.textMuted}`}
-                                >
-                                  Purchase Price
-                                </span>
-                                <span
-                                  className={`text-4xl font-black ${t.textMain}`}
-                                >
-                                  ${propDef.price}
-                                </span>
-                              </div>
-                              <div>
-                                <label
-                                  className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
-                                >
-                                  Select Buyer
-                                </label>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {state.players
-                                    .filter((p) => !p.isBankrupt)
-                                    .map((p) => (
-                                      <button
-                                        key={p.id}
-                                        onClick={() =>
-                                          setPropConfirmAction({
-                                            type: "BUY",
-                                            playerId: p.id,
-                                            amount: propDef.price,
-                                          })
-                                        }
-                                        className={`py-3 rounded-xl border flex flex-col items-center gap-1 transition-all duration-200 active:scale-95 ${t.input} ${t.borderHover}`}
-                                      >
-                                        <span
-                                          className={`w-2 h-2 rounded-full ${p.color.bg}`}
-                                        ></span>
-                                        <span
-                                          className={`text-xs font-bold truncate w-full text-center px-1 ${t.textMain}`}
-                                        >
-                                          {p.name}
-                                        </span>
-                                      </button>
-                                    ))}
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="space-y-5">
-                              <div
-                                className={`flex justify-between items-center p-3 rounded-xl border transition-colors ${t.modalHeader}`}
-                              >
-                                <span
-                                  className={`text-xs font-bold ${t.textMuted}`}
-                                >
-                                  Owner
-                                </span>
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={`w-2 h-2 rounded-full ${owner.color.bg}`}
-                                  ></span>
-                                  <span
-                                    className={`font-bold text-sm ${t.textMain}`}
-                                  >
-                                    {owner.name}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {pState.mortgaged ? (
-                                <div className="text-center space-y-4">
-                                  <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl">
-                                    <AlertOctagon
-                                      size={24}
-                                      className="text-rose-500 mx-auto mb-2"
-                                    />
-                                    <span className="text-rose-500 font-bold block">
-                                      Property Mortgaged
-                                    </span>
-                                  </div>
-                                  <button
-                                    onClick={() =>
-                                      setPropConfirmAction({
-                                        type: "UNMORTGAGE",
-                                        playerId: owner.id,
-                                        amount: unmortgageCost,
-                                      })
-                                    }
-                                    className="w-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all duration-200"
-                                  >
-                                    Unmortgage (${unmortgageCost})
-                                  </button>
-
-                                  <div
-                                    className={`pt-4 border-t text-left ${t.border}`}
-                                  >
-                                    <label className="text-[10px] text-rose-500 font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                      <Swords size={12} /> Hostile Takeover (2x
-                                      Price)
-                                    </label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                      {state.players
-                                        .filter(
-                                          (p) =>
-                                            p.id !== owner.id && !p.isBankrupt,
-                                        )
-                                        .map((p) => (
-                                          <button
-                                            key={p.id}
-                                            onClick={() =>
-                                              setPropConfirmAction({
-                                                type: "HOSTILE_TAKEOVER",
-                                                playerId: p.id,
-                                                amount: propDef.price * 2,
-                                              })
-                                            }
-                                            className="px-3 py-2 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-95"
-                                          >
-                                            <div className="flex items-center gap-1">
-                                              <span
-                                                className={`w-2 h-2 rounded-full ${p.color.bg}`}
-                                              ></span>
-                                              <span
-                                                className={`text-xs font-bold ${isDark ? "text-rose-300" : "text-rose-600"}`}
-                                              >
-                                                {p.name}
-                                              </span>
-                                            </div>
-                                          </button>
-                                        ))}
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="space-y-3">
-                                  {propDef.type === "street" &&
-                                    (() => {
-                                      const groupProps = state.board.filter(
-                                        (b) => b.group === propDef.group,
-                                      );
-                                      const hasMonopoly = groupProps.every(
-                                        (b) =>
-                                          state.propertyState[b.id]?.ownerId ===
-                                          owner.id,
-                                      );
-                                      const anyMortgagedInGroup =
-                                        groupProps.some(
-                                          (b) =>
-                                            state.propertyState[b.id]
-                                              ?.mortgaged,
-                                        );
-                                      const canBuild =
-                                        hasMonopoly && !anyMortgagedInGroup;
-
-                                      return (
-                                        <div
-                                          className={`p-4 rounded-xl border transition-colors ${t.modalHeader}`}
-                                        >
-                                          <div className="flex justify-between items-center mb-4">
-                                            <span
-                                              className={`text-xs font-bold ${t.textMuted}`}
-                                            >
-                                              Development
-                                            </span>
-                                            <div className="flex gap-1">
-                                              {pState.houses === 5 ? (
-                                                <Building
-                                                  size={16}
-                                                  className="text-rose-500"
-                                                  fill="currentColor"
-                                                />
-                                              ) : (
-                                                Array.from({
-                                                  length: pState.houses,
-                                                }).map((_, i) => (
-                                                  <Home
-                                                    key={i}
-                                                    size={16}
-                                                    className="text-emerald-500"
-                                                    fill="currentColor"
-                                                  />
-                                                ))
-                                              )}
-                                              {pState.houses === 0 && (
-                                                <span
-                                                  className={`text-xs font-bold ${t.textFaint}`}
-                                                >
-                                                  Empty Lot
-                                                </span>
-                                              )}
-                                            </div>
-                                          </div>
-                                          <div className="flex gap-2 flex-col sm:flex-row">
-                                            <button
-                                              onClick={() =>
-                                                setPropConfirmAction({
-                                                  type: "BUILD",
-                                                  playerId: owner.id,
-                                                  amount: propDef.build,
-                                                })
-                                              }
-                                              disabled={
-                                                pState.houses >= 5 || !canBuild
-                                              }
-                                              className={`flex-1 disabled:opacity-50 text-emerald-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-emerald-500/50`}
-                                            >
-                                              Build (${propDef.build})
-                                            </button>
-                                            <button
-                                              onClick={() =>
-                                                setPropConfirmAction({
-                                                  type: "SELL_BUILD",
-                                                  playerId: owner.id,
-                                                  amount: propDef.build / 2,
-                                                })
-                                              }
-                                              disabled={pState.houses === 0}
-                                              className={`flex-1 disabled:opacity-50 text-rose-500 text-xs font-bold py-3 rounded-lg transition-all duration-200 active:scale-95 border ${t.input} hover:border-rose-500/50`}
-                                            >
-                                              Sell (${propDef.build / 2})
-                                            </button>
-                                          </div>
-                                          {!hasMonopoly ? (
-                                            <p
-                                              className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
-                                            >
-                                              Requires full {propDef.group} set
-                                              to build.
-                                            </p>
-                                          ) : anyMortgagedInGroup ? (
-                                            <p
-                                              className={`text-[10px] font-bold text-rose-500 mt-3 text-center`}
-                                            >
-                                              Cannot build while a{" "}
-                                              {propDef.group} property is
-                                              mortgaged.
-                                            </p>
-                                          ) : null}
-                                        </div>
-                                      );
-                                    })()}
-                                  <button
-                                    onClick={() =>
-                                      setPropConfirmAction({
-                                        type: "MORTGAGE",
-                                        playerId: owner.id,
-                                        amount: propDef.mort,
-                                      })
-                                    }
-                                    disabled={pState.houses > 0}
-                                    className={`w-full disabled:opacity-50 text-amber-500 font-bold py-3 rounded-xl transition-all duration-200 active:scale-95 border ${t.input} hover:border-amber-500/50`}
-                                  >
-                                    Mortgage to Bank (+${propDef.mort})
-                                  </button>
-                                </div>
-                              )}
-
-                              {!pState.mortgaged && (
-                                <div className={`pt-4 border-t ${t.border}`}>
-                                  <button
-                                    onClick={() => {
-                                      setTradeWizard({
-                                        step: 1,
-                                        p1Id: owner.id,
-                                        p1Offer: {
-                                          cash: 0,
-                                          props: [activePropId],
-                                        },
-                                        p2Offer: { cash: 0, props: [] },
-                                      });
-                                      setActivePropId(null);
-                                    }}
-                                    className={`w-full py-3 rounded-xl border font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${t.input} hover:border-sky-500 text-sky-500`}
-                                  >
-                                    <ArrowRightLeft size={16} /> Open Trade
-                                    Wizard
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-              {/* PLAYER TRANSACTION MODAL */}
-              {modalConfig &&
-                activeP &&
-                (() => {
-                  return (
-                    <div
-                      className={`absolute inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 ease-out ${t.modalOverlay}`}
-                    >
-                      <div
-                        className={`w-full sm:w-[420px] rounded-t-3xl sm:rounded-3xl border-t sm:border shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-8 duration-300 ease-out relative ${t.modalBg}`}
-                      >
-                        <div
-                          className={`px-6 py-4 flex justify-between items-center rounded-t-3xl border-b shrink-0 ${t.modalHeader}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-3 h-3 rounded-full ${activeP.color.bg}`}
-                            ></div>
-                            <div>
-                              <h3
-                                className={`font-bold leading-tight ${t.textMain}`}
-                              >
-                                {activeP.name}
-                              </h3>
-                              <div className="flex gap-2 text-xs font-mono font-medium">
-                                <span className="text-emerald-500">
-                                  Bal: ${activeP.balance.toLocaleString()}
-                                </span>
-                                {activeP.debt > 0 && (
-                                  <span className="text-rose-500">
-                                    Debt: -${activeP.debt.toLocaleString()}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            onClick={closeModals}
-                            className={`p-3 z-[60] rounded-full transition-colors ${t.textMuted} hover:bg-black/10 ${t.textMain}`}
-                          >
-                            <X size={20} />
-                          </button>
-                        </div>
-
-                        <div
-                          className={`flex p-2 gap-2 border-b overflow-x-auto hide-scrollbar shrink-0 ${t.modalHeader}`}
-                        >
-                          <button
-                            onClick={() => {
-                              setTxType("PAY_PLAYER");
-                              dispatch({ type: "CLEAR_ERROR" });
-                            }}
-                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_PLAYER" ? "bg-sky-500 text-white shadow-md shadow-sky-500/20" : t.actionTabNormal}`}
-                          >
-                            Pay Player
-                          </button>
-                          <button
-                            onClick={() => {
-                              setTxType("PAY_BANK");
-                              dispatch({ type: "CLEAR_ERROR" });
-                            }}
-                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "PAY_BANK" ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" : t.actionTabNormal}`}
-                          >
-                            Pay Bank
-                          </button>
-                          <button
-                            onClick={() => {
-                              setTxType("DEBT");
-                              dispatch({ type: "CLEAR_ERROR" });
-                            }}
-                            disabled={!state.settings.enableDebt}
-                            className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "DEBT" ? "bg-rose-500 text-white shadow-md shadow-rose-500/20" : t.actionTabNormal} ${!state.settings.enableDebt ? "opacity-30 cursor-not-allowed hover:bg-transparent" : ""}`}
-                          >
-                            Take Loan
-                          </button>
-                          {activeP.debt > 0 && (
-                            <button
-                              onClick={() => {
-                                setTxType("REPAY");
-                                dispatch({ type: "CLEAR_ERROR" });
-                              }}
-                              className={`shrink-0 flex-1 whitespace-nowrap min-w-[80px] h-10 px-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-200 flex items-center justify-center ${txType === "REPAY" ? "bg-purple-500 text-white shadow-md shadow-purple-500/20" : t.actionTabNormal}`}
-                            >
-                              Repay
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
-                          {txType === "PAY_PLAYER" && (
-                            <div className="mb-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                              <label
-                                className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${t.textMuted}`}
-                              >
-                                Recipient
-                              </label>
-                              <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
-                                {availableTargets.map((p) => (
-                                  <button
-                                    key={p.id}
-                                    onClick={() => setTargetId(p.id)}
-                                    className={`flex-shrink-0 px-4 py-2 rounded-xl border transition-all duration-200 flex items-center gap-2 ${targetId === p.id ? `border-sky-500 shadow-md ${t.p2pTag} scale-105` : `${t.input} ${t.textFaint} hover:border-sky-500/50`}`}
-                                  >
-                                    <span
-                                      className={`w-2 h-2 rounded-full ${p.color.bg}`}
-                                    ></span>
-                                    <span
-                                      className={`font-semibold text-sm ${targetId === p.id ? t.textMain : ""}`}
-                                    >
-                                      {p.name}
-                                    </span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          <div
-                            className={`mb-4 rounded-2xl border py-2 flex flex-col items-center justify-center relative transition-colors ${t.card}`}
-                          >
-                            <div
-                              className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest ${t.textFaint}`}
-                            >
-                              Amount
-                            </div>
-                            <div className="flex items-start justify-center gap-1">
-                              <span
-                                className={`text-xl mt-1.5 font-bold ${t.textMuted}`}
-                              >
-                                $
-                              </span>
-                              <span
-                                className={`text-5xl font-black tracking-tighter truncate max-w-[250px] transition-colors ${amountStr === "0" ? t.textFaint : txType === "PAY_BANK" ? "text-amber-500" : txType === "DEBT" || txType === "REPAY" ? "text-rose-500" : "text-sky-500"}`}
-                              >
-                                {parseInt(amountStr || 0, 10).toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-2 mb-4">
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                              <button
-                                key={num}
-                                onClick={() => handleNumpad(num.toString())}
-                                className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
-                              >
-                                {num}
-                              </button>
-                            ))}
-                            <button
-                              onClick={() => handleNumpad("00")}
-                              className={`h-12 rounded-2xl text-lg font-black transition-all ${t.numpad}`}
-                            >
-                              00
-                            </button>
-                            <button
-                              onClick={() => handleNumpad("0")}
-                              className={`h-12 rounded-2xl text-2xl font-black transition-all ${t.numpad}`}
-                            >
-                              0
-                            </button>
-                            <button
-                              onClick={() => handleNumpad("DEL")}
-                              className={`h-12 rounded-2xl flex items-center justify-center transition-all ${t.numpadDel}`}
-                            >
-                              <X size={24} strokeWidth={3} />
-                            </button>
-                          </div>
-
-                          <button
-                            onClick={executeTx}
-                            disabled={
-                              amountStr === "0" ||
-                              (txType === "PAY_PLAYER" && !targetId)
-                            }
-                            className={`w-full py-3 rounded-2xl text-lg font-black flex items-center justify-center gap-2 transition-all duration-200
-                              ${amountStr === "0" || (txType === "PAY_PLAYER" && !targetId) ? `opacity-50 cursor-not-allowed ${t.input}` : txType === "PAY_BANK" ? "bg-amber-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-95" : txType === "DEBT" ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-95" : txType === "REPAY" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30 hover:scale-[1.02] active:scale-95" : "bg-sky-500 text-white shadow-lg shadow-sky-500/30 hover:scale-[1.02] active:scale-95"}`}
-                          >
-                            <Check size={24} strokeWidth={3} />{" "}
-                            {txType === "DEBT"
-                              ? "Request Loan"
-                              : txType === "REPAY"
-                                ? "Repay Debt"
-                                : "Confirm"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-              {/* AUTO BANKRUPTCY POPUP */}
-              {state.pendingBankruptcy &&
-                (() => {
-                  const p = state.players.find(
-                    (p) => p.id === state.pendingBankruptcy,
-                  );
-                  return (
-                    <div
-                      className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
-                    >
-                      <div
-                        className={`border border-rose-500/50 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 ease-out ${t.modalBg}`}
-                      >
-                        <div className="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mb-4 ring-2 ring-rose-500/20">
-                          <AlertOctagon size={32} />
-                        </div>
-                        <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
-                          Zero Balance Reached
-                        </h2>
-                        <p className={`text-sm mb-6 ${t.textMuted}`}>
-                          <strong className={t.textMain}>{p.name}</strong> has
-                          exactly $0. Raise funds or declare bankruptcy.
-                        </p>
-                        <div className="flex flex-col gap-3 w-full">
-                          <button
-                            onClick={() =>
-                              dispatch({ type: "DISMISS_BANKRUPTCY" })
-                            }
-                            className={`w-full py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                          >
-                            Resolve Debt Manually
-                          </button>
-                          <button
-                            onClick={() => {
-                              dispatch({
-                                type: "BANKRUPT_PLAYER",
-                                payload: p.id,
-                              });
-                              showToast(`${p.name} is bankrupt`, "error");
-                            }}
-                            className="w-full py-3 bg-rose-500/10 text-rose-500 font-bold rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-all duration-200 active:scale-95"
-                          >
-                            Declare Bankrupt
-                          </button>
-                          <button
-                            onClick={() => {
-                              dispatch({
-                                type: "BANKRUPT_PLAYER",
-                                payload: p.id,
-                              });
-                              dispatch({ type: "END_GAME_RANKING" });
-                            }}
-                            className="w-full py-3 bg-rose-600 text-white font-bold rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                          >
-                            Declare Bankrupt & End Game
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-              {/* END GAME CONFIRM MODAL */}
-              {resetConfirm && (
-                <div
-                  className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
-                >
-                  <div
-                    className={`border border-rose-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
-                  >
-                    <div className="text-center mb-6">
-                      <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
-                        Reset Game?
-                      </h2>
-                      <p className={`text-sm ${t.textMuted}`}>
-                        This will wipe all progress and return to setup.
-                      </p>
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setResetConfirm(false)}
-                        className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                      >
-                        Cancel
+                        Declare Bankrupt
                       </button>
                       <button
                         onClick={() => {
-                          dispatch({ type: "RESET_GAME" });
-                          setResetConfirm(false);
-                        }}
-                        className="flex-1 py-3 bg-rose-600 text-white font-black rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                      >
-                        Reset
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {endGameConfirm && (
-                <div
-                  className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
-                >
-                  <div
-                    className={`border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
-                  >
-                    <div className="text-center mb-6">
-                      <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
-                        End Game?
-                      </h2>
-                      <p className={`text-sm ${t.textMuted}`}>
-                        Calculate final net worths and crown a winner.
-                      </p>
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setEndGameConfirm(false)}
-                        className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={() => {
+                          dispatch({
+                            type: "BANKRUPT_PLAYER",
+                            payload: p.id,
+                          });
                           dispatch({ type: "END_GAME_RANKING" });
-                          setEndGameConfirm(false);
                         }}
-                        className="flex-1 py-3 bg-amber-500 text-white font-black rounded-xl shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                        className="w-full py-3 bg-rose-600 text-white font-bold rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                       >
-                        End Game
+                        Declare Bankrupt & End Game
                       </button>
                     </div>
                   </div>
                 </div>
-              )}
+              );
+            })()}
+
+          {/* END GAME CONFIRM MODAL */}
+          {resetConfirm && (
+            <div
+              className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+            >
+              <div
+                className={`border border-rose-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
+              >
+                <div className="text-center mb-6">
+                  <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                    Reset Game?
+                  </h2>
+                  <p className={`text-sm ${t.textMuted}`}>
+                    This will wipe all progress and return to setup.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setResetConfirm(false)}
+                    className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      dispatch({ type: "RESET_GAME" });
+                      setResetConfirm(false);
+                    }}
+                    className="flex-1 py-3 bg-rose-600 text-white font-black rounded-xl shadow-lg shadow-rose-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {endGameConfirm && (
+            <div
+              className={`absolute inset-0 z-[150] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200 p-4 ${t.modalOverlay}`}
+            >
+              <div
+                className={`border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 ease-out ${t.modalBg}`}
+              >
+                <div className="text-center mb-6">
+                  <h2 className={`text-xl font-black mb-2 ${t.textMain}`}>
+                    End Game?
+                  </h2>
+                  <p className={`text-sm ${t.textMuted}`}>
+                    Calculate final net worths and crown a winner.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEndGameConfirm(false)}
+                    className={`flex-1 py-3 font-bold rounded-xl transition-all duration-200 active:scale-95 ${t.input}`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      dispatch({ type: "END_GAME_RANKING" });
+                      setEndGameConfirm(false);
+                    }}
+                    className="flex-1 py-3 bg-amber-500 text-white font-black rounded-xl shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                  >
+                    End Game
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
